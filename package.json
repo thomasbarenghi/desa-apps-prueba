@@ -1,0 +1,13 @@
+{
+  "name": "desa-apps",
+  "private": true,
+  "scripts": {
+    "prepare": "husky",
+    "lint": "npm --prefix api run lint && npm --prefix client run lint",
+    "build": "npm --prefix api run build && npm --prefix client run build",
+    "format": "npm --prefix client run format"
+  },
+  "devDependencies": {
+    "husky": "^9.1.7"
+  }
+}
