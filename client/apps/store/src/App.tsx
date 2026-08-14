@@ -1,11 +1,17 @@
-import { Box, Text } from "@chakra-ui/react";
+import { Routes, Route } from "react-router-dom";
+import { StoreLayout } from "./layouts/StoreLayout";
+import { HomePage } from "./pages/HomePage";
+import { ProfilePage } from "./pages/ProfilePage";
+import { EditProfilePage } from "./pages/EditProfilePage";
 
-export default function App() {
+export const App = () => {
   return (
-    <Box minH="100vh" display="flex" alignItems="center" justifyContent="center">
-      <Text fontSize="2xl" fontWeight="bold">
-        Tienda
-      </Text>
-    </Box>
+    <Routes>
+      <Route element={<StoreLayout />}>
+        <Route index element={<HomePage />} />
+        <Route path="/perfil" element={<ProfilePage />} />
+        <Route path="/perfil/editar" element={<EditProfilePage />} />
+      </Route>
+    </Routes>
   );
-}
+};
