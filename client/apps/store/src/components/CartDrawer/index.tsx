@@ -9,47 +9,79 @@ import {
   DrawerPositioner,
   DrawerRoot,
   DrawerTitle,
-  Flex,
+  HStack,
   Portal,
   Text,
+  VStack,
 } from "@chakra-ui/react"
+import ShoppingCart from "@gravity-ui/icons/ShoppingCart"
 import { Link } from "react-router-dom"
-import { useCartCount } from "../CartButton/hooks/useCartCount"
+import { cartTotal, useCartStore } from "../../stores/cartStore"
+import { formatPrice } from "../../utils/catalog"
+import { CartLineCard } from "../CartLineCard"
+import { EmptyState } from "../EmptyState"
 import type { CartDrawerProps } from "./types"
 
-export const CartDrawer = ({ open, onClose, clientId }: CartDrawerProps) => {
-  const { count } = useCartCount({ clientId })
-  const isEmpty = count === 0
+export const CartDrawer = ({ open, onClose }: CartDrawerProps) => {
+  const lines = useCartStore((state) => state.lines)
+  const setQuantity = useCartStore((state) => state.setQuantity)
+  const removeLine = useCartStore((state) => state.removeLine)
+  const isEmpty = lines.length === 0
 
   return (
     <DrawerRoot open={open} onOpenChange={(details) => !details.open && onClose()} placement="end">
       <Portal>
         <DrawerBackdrop />
         <DrawerPositioner>
-          <DrawerContent h="100dvh" maxW="md">
+          <DrawerContent h="100dvh" maxW="md" bg="bg.panel">
             <DrawerHeader>
               <DrawerTitle>Mi carrito</DrawerTitle>
               <DrawerCloseTrigger />
             </DrawerHeader>
             <DrawerBody>
               {isEmpty ? (
-                <Flex direction="column" align="center" justify="center" height="full" gap="2">
-                  <Text color="fg.muted">Tu carrito está vacío.</Text>
-                </Flex>
+                <EmptyState
+                  icon={<ShoppingCart width={40} height={40} />}
+                  title="Tu carrito está vacío"
+                  description="Explorá el catálogo y sumá tus favoritos para armar el pedido."
+                />
               ) : (
-                <Text>Tenés {count} ítem{count > 1 ? "s" : ""} en tu carrito.</Text>
+                <VStack gap="3" align="stretch">
+                  {lines.map((line) => (
+                    <CartLineCard
+                      key={line.id}
+                      line={line}
+                      onQuantityChange={setQuantity}
+                      onRemove={removeLine}
+                    />
+                  ))}
+                </VStack>
               )}
             </DrawerBody>
             <DrawerFooter>
-              {isEmpty ? (
-                <Button asChild width="full" variant="solid" bg="brand.600" color="white" onClick={onClose}>
-                  <Link to="/catalogo">Explorar productos</Link>
+              <VStack gap="3" width="full" align="stretch">
+                {!isEmpty ? (
+                  <HStack justify="space-between">
+                    <Text color="fg.muted">Total</Text>
+                    <Text fontWeight="semibold" fontSize="lg" fontVariantNumeric="tabular-nums">
+                      {formatPrice(cartTotal(lines))}
+                    </Text>
+                  </HStack>
+                ) : null}
+                <Button
+                  asChild
+                  width="full"
+                  variant="solid"
+                  bg="brand.600"
+                  color="white"
+                  _hover={{ bg: "brand.700" }}
+                  onClick={onClose}
+                >
+                  <Link to={isEmpty ? "/catalogo" : "/carrito"}>
+                    {isEmpty ? "Explorar productos" : "Ver carrito y confirmar"}
+                  </Link>
                 </Button>
-              ) : (
-                <Button asChild width="full" variant="solid" bg="brand.600" color="white" onClick={onClose}>
-                  <Link to="/carrito">Ver carrito</Link>
-                </Button>
-              )}
+              </VStack>
             </DrawerFooter>
           </DrawerContent>
         </DrawerPositioner>

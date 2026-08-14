@@ -1,4 +1,4 @@
-import { Button, Field, Input, VStack, HStack } from "@chakra-ui/react"
+import { Button, Field, HStack, Input, VStack } from "@chakra-ui/react"
 import { useProfile } from "../../hooks/useProfile"
 import { useProfileForm } from "./hooks/useProfileForm"
 
@@ -16,26 +16,54 @@ export const ProfileForm = ({ userId }: ProfileFormProps) => {
     <VStack align="stretch" gap="4">
       <Field.Root>
         <Field.Label>Nombre</Field.Label>
-        <Input value={values.firstName} onChange={(e) => onChange("firstName", e.target.value)} />
+        <Input
+          value={values.firstName}
+          onChange={(e) => onChange("firstName", e.target.value)}
+          size="lg"
+          borderRadius="xl"
+          bg="bg.panel"
+        />
       </Field.Root>
       <Field.Root>
         <Field.Label>Apellido</Field.Label>
-        <Input value={values.lastName} onChange={(e) => onChange("lastName", e.target.value)} />
+        <Input
+          value={values.lastName}
+          onChange={(e) => onChange("lastName", e.target.value)}
+          size="lg"
+          borderRadius="xl"
+          bg="bg.panel"
+        />
       </Field.Root>
       <Field.Root>
         <Field.Label>Correo electrónico</Field.Label>
-        <Input value={user?.email} readOnly />
+        <Input value={user?.email} readOnly size="lg" borderRadius="xl" bg="bg.panel" color="fg.subtle" />
       </Field.Root>
       <Field.Root>
         <Field.Label>Teléfono</Field.Label>
-        <Input value={values.phone} onChange={(e) => onChange("phone", e.target.value)} />
+        <Input
+          value={values.phone}
+          onChange={(e) => onChange("phone", e.target.value)}
+          size="lg"
+          borderRadius="xl"
+          bg="bg.panel"
+        />
       </Field.Root>
-      <HStack gap="2">
-        <Button variant="solid" bg="brand.600" color="white" flex="1" onClick={onSave} disabled={!isDirty}>
+      <HStack gap="2" marginTop="2">
+        <Button
+          variant="solid"
+          bg="brand.600"
+          color="white"
+          flex="1"
+          borderRadius="full"
+          size="lg"
+          _hover={{ bg: "brand.700" }}
+          onClick={onSave}
+          disabled={!isDirty}
+        >
           Guardar cambios
         </Button>
-        <Button variant="ghost" onClick={onCancel} disabled={!isDirty}>
-          Cancelar cambios
+        <Button variant="ghost" onClick={onCancel} disabled={!isDirty} borderRadius="full">
+          Cancelar
         </Button>
       </HStack>
     </VStack>

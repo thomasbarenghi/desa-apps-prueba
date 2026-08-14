@@ -3,21 +3,19 @@ import Person from "@gravity-ui/icons/Person"
 import { NavLink } from "react-router-dom"
 import { CartButton } from "../CartButton"
 import { ColorModeButton } from "../ColorModeProvider/ColorModeButton"
-import { useCartCount } from "../CartButton/hooks/useCartCount"
-import type { StoreHeaderProps } from "./types"
 
-interface HeaderActionsProps extends Pick<StoreHeaderProps, "clientId"> {
+interface HeaderActionsProps {
   onOpenCart: () => void
 }
 
-export const HeaderActions = ({ clientId, onOpenCart }: HeaderActionsProps) => {
-  const { count } = useCartCount({ clientId })
-
+export const HeaderActions = ({ onOpenCart }: HeaderActionsProps) => {
   return (
     <HStack gap="1">
-      <ColorModeButton />
-      <Box display={{ base: "none", md: "flex" }}>
-        <CartButton count={count} onClick={onOpenCart} />
+      <Box display={{ base: "none", md: "block" }}>
+        <ColorModeButton />
+      </Box>
+      <Box display={{ base: "none", md: "block" }}>
+        <CartButton onClick={onOpenCart} />
       </Box>
       <ChakraLink
         asChild
@@ -26,7 +24,7 @@ export const HeaderActions = ({ clientId, onOpenCart }: HeaderActionsProps) => {
         padding="2"
         borderRadius="full"
         color="fg.muted"
-        _hover={{ color: "fg" }}
+        _hover={{ color: "fg", bg: "bg.muted" }}
       >
         <NavLink to="/perfil">
           <Person width={20} height={20} />

@@ -3,30 +3,45 @@ import { useLocation } from "react-router-dom"
 import { useCartCount } from "../CartButton/hooks/useCartCount"
 import { MobileNavItem } from "./MobileNavItem"
 import { mobileNavItems } from "./utils/navigation"
-import type { MobileStoreNavigationProps } from "./types"
 
-export const MobileStoreNavigation = ({ clientId }: MobileStoreNavigationProps) => {
+export const MobileStoreNavigation = () => {
   const { pathname } = useLocation()
-  const { count } = useCartCount({ clientId })
+  const { count } = useCartCount()
+
+  const isActive = (path: string) => {
+    if (path === "/") return pathname === "/"
+    return pathname.startsWith(path)
+  }
 
   return (
     <Box
-      as="nav"
-      bg="bg.panel"
-      borderTop="1px"
-      borderColor="border.subtle"
       position="fixed"
-      bottom="0"
-      insetX="0"
+      bottom="4"
+      left="0"
+      right="0"
+      display={{ base: "flex", md: "none" }}
+      justifyContent="center"
+      paddingX="4"
       zIndex="docked"
-      display={{ base: "block", md: "none" }}
+      pointerEvents="none"
     >
-      <HStack gap="0">
+      <HStack
+        as="nav"
+        gap="0"
+        bg="bg.panel"
+        borderRadius="full"
+        padding="1"
+        border="1px solid"
+        borderColor="border.subtle"
+        boxShadow="lg"
+        pointerEvents="auto"
+        aria-label="Navegación principal"
+      >
         {mobileNavItems.map((item) => (
           <MobileNavItem
             key={item.id}
             item={item}
-            isActive={pathname === item.path}
+            isActive={isActive(item.path)}
             count={item.id === "cart" ? count : undefined}
           />
         ))}

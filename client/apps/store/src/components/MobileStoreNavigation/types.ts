@@ -3,7 +3,3 @@ export interface MobileNavItem {
   label: string
   path: string
 }
-
-export interface MobileStoreNavigationProps {
-  clientId?: number
-}

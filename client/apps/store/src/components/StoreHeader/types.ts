@@ -3,8 +3,3 @@ export interface NavItem {
   label: string
   path: string
 }
-
-export interface StoreHeaderProps {
-  clientId?: number
-  onNavigate?: () => void
-}
