@@ -22,7 +22,7 @@ No se aceptan tests que solo cubran el camino feliz.
 ## Estructura de un test de alta calidad
 
 ```ts
-describe("OrderStatusService.changeStatus", () => {
+describe("OrderStatusOrchestrator.changeStatus", () => {
   // Tabla de casos: cada fila es un escenario completo
   const cases: Array<{
     name: string;
@@ -38,7 +38,8 @@ describe("OrderStatusService.changeStatus", () => {
   ];
 
   it.each(cases)("$name → $expected", async ({ current, target, expected }) => {
-    const result = await service.changeStatus(orderId, current, target);
+    // el OrderService mockeado devuelve un pedido en el estado `current`
+    const result = await orchestrator.changeStatus(orderId, target);
     if (expected === "ok") {
       expect(result).toBeDefined();
     } else {
