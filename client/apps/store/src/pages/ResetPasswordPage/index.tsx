@@ -1,20 +1,11 @@
-import { VStack } from "@chakra-ui/react"
-import { AuthSuccess, PageHeader, PasswordField, PrimaryButton } from "@repo/components"
-import { routes } from "../../routes"
-import { useResetPassword } from "./hooks/useResetPassword"
+import { VStack } from '@chakra-ui/react'
+import { FormProvider } from 'react-hook-form'
+import { AuthSuccess, FormPasswordField, PageHeader, PrimaryButton } from '@repo/components'
+import { routes } from '../../routes'
+import { useResetPassword } from './hooks/useResetPassword'
 
 export const ResetPasswordPage = () => {
-  const {
-    password,
-    setPassword,
-    confirm,
-    setConfirm,
-    passwordsMatch,
-    submitting,
-    done,
-    isValid,
-    onSubmit,
-  } = useResetPassword()
+  const { form, submitting, done, onSubmit } = useResetPassword()
 
   if (done) {
     return (
@@ -35,29 +26,32 @@ export const ResetPasswordPage = () => {
       />
 
       <form onSubmit={onSubmit}>
-        <VStack gap="4" align="stretch">
-          <PasswordField
-            label="Nueva contraseña"
-            required
-            autoComplete="new-password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            placeholder="Mínimo 6 caracteres"
-          />
-          <PasswordField
-            label="Repetir contraseña"
-            required
-            invalid={!passwordsMatch}
-            errorText={!passwordsMatch ? "Las contraseñas no coinciden." : undefined}
-            autoComplete="new-password"
-            value={confirm}
-            onChange={(e) => setConfirm(e.target.value)}
-            placeholder="Repetí tu contraseña"
-          />
-          <PrimaryButton type="submit" disabled={!isValid || submitting} loading={submitting} marginTop="2">
-            Restablecer contraseña
-          </PrimaryButton>
-        </VStack>
+        <FormProvider {...form}>
+          <VStack gap="4" align="stretch">
+            <FormPasswordField
+              name="password"
+              label="Nueva contraseña"
+              required
+              autoComplete="new-password"
+              placeholder="Mínimo 6 caracteres"
+            />
+            <FormPasswordField
+              name="confirm"
+              label="Repetir contraseña"
+              required
+              autoComplete="new-password"
+              placeholder="Repetí tu contraseña"
+            />
+            <PrimaryButton
+              type="submit"
+              disabled={!form.formState.isValid || submitting}
+              loading={submitting}
+              marginTop="2"
+            >
+              Restablecer contraseña
+            </PrimaryButton>
+          </VStack>
+        </FormProvider>
       </form>
     </VStack>
   )

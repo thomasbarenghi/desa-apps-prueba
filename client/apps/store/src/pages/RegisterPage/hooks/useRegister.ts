@@ -1,64 +1,48 @@
-import { useState } from "react"
-import type { FormEvent } from "react"
-import { useNavigate } from "react-router-dom"
-import { routes } from "../../../routes"
-import { useAuthStore } from "@repo/api"
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { useState } from 'react'
+import type { z } from 'zod'
+import { useNavigate } from 'react-router-dom'
+import { registerSchema } from '@repo/domain'
+import { routes } from '../../../routes'
+import { useAuthStore } from '@repo/api'
+
+type RegisterValues = z.infer<typeof registerSchema>
 
 export const useRegister = () => {
   const register = useAuthStore((state) => state.register)
   const navigate = useNavigate()
-
-  const [firstName, setFirstName] = useState("")
-  const [lastName, setLastName] = useState("")
-  const [email, setEmail] = useState("")
-  const [phone, setPhone] = useState("")
-  const [password, setPassword] = useState("")
-  const [confirm, setConfirm] = useState("")
   const [submitting, setSubmitting] = useState(false)
 
-  const passwordsMatch = password === confirm
-  const isValid =
-    firstName.trim() !== "" &&
-    lastName.trim() !== "" &&
-    email.trim() !== "" &&
-    phone.trim() !== "" &&
-    password.length >= 6 &&
-    passwordsMatch
+  const form = useForm<RegisterValues>({
+    resolver: zodResolver(registerSchema),
+    defaultValues: {
+      firstName: '',
+      lastName: '',
+      email: '',
+      phone: '',
+      password: '',
+      confirm: '',
+    },
+    mode: 'onTouched',
+    reValidateMode: 'onChange',
+  })
 
-  const onSubmit = async (event?: FormEvent) => {
-    event?.preventDefault()
-    if (!isValid || submitting) return
+  const onSubmit = form.handleSubmit(async (values) => {
     setSubmitting(true)
     try {
       await register({
-        firstName: firstName.trim(),
-        lastName: lastName.trim(),
-        email: email.trim(),
-        phone: phone.trim(),
-        password,
+        firstName: values.firstName.trim(),
+        lastName: values.lastName.trim(),
+        email: values.email.trim(),
+        phone: values.phone.trim(),
+        password: values.password,
       })
       navigate(routes.home, { replace: true })
     } finally {
       setSubmitting(false)
     }
-  }
+  })
 
-  return {
-    firstName,
-    setFirstName,
-    lastName,
-    setLastName,
-    email,
-    setEmail,
-    phone,
-    setPhone,
-    password,
-    setPassword,
-    confirm,
-    setConfirm,
-    passwordsMatch,
-    submitting,
-    isValid,
-    onSubmit,
-  }
+  return { form, submitting, onSubmit }
 }

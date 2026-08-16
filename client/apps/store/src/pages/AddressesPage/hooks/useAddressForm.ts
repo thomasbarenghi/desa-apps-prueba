@@ -1,8 +1,14 @@
-import { useState } from "react"
-import { useAddressStore } from "../../../stores/addressStore"
-import type { Address, AddressInput } from "@repo/domain"
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { useState } from 'react'
+import type { z } from 'zod'
+import { useAddressStore } from '../../../stores/addressStore'
+import { addressSchema } from '@repo/domain'
+import type { Address, AddressInput } from '@repo/domain'
 
-const EMPTY_FORM: AddressInput = { label: "", street: "", city: "", reference: "" }
+type AddressValues = z.infer<typeof addressSchema>
+
+const EMPTY: AddressValues = { label: '', street: '', city: '', reference: '' }
 
 export const useAddressForm = () => {
   const addAddress = useAddressStore((state) => state.addAddress)
@@ -10,56 +16,44 @@ export const useAddressForm = () => {
 
   const [editingId, setEditingId] = useState<string | null>(null)
   const [open, setOpen] = useState(false)
-  const [form, setForm] = useState<AddressInput>(EMPTY_FORM)
+
+  const form = useForm<AddressValues>({
+    resolver: zodResolver(addressSchema),
+    defaultValues: EMPTY,
+    mode: 'onTouched',
+    reValidateMode: 'onChange',
+  })
 
   const openCreate = () => {
     setEditingId(null)
-    setForm(EMPTY_FORM)
+    form.reset(EMPTY)
     setOpen(true)
   }
 
   const openEdit = (address: Address) => {
     setEditingId(address.id)
-    setForm({
+    form.reset({
       label: address.label,
       street: address.street,
       city: address.city,
-      reference: address.reference ?? "",
+      reference: address.reference ?? '',
     })
     setOpen(true)
   }
 
   const close = () => setOpen(false)
 
-  const setField =
-    (field: keyof AddressInput) =>
-    (value: string) =>
-      setForm((prev) => ({ ...prev, [field]: value }))
-
-  const isValid = form.street.trim() !== "" && form.city.trim() !== ""
-
-  const submit = () => {
-    if (!isValid) return
+  const onSubmit = form.handleSubmit((values) => {
     const input: AddressInput = {
-      label: form.label.trim() || "Dirección",
-      street: form.street.trim(),
-      city: form.city.trim(),
-      reference: form.reference?.trim() || undefined,
+      label: values.label.trim() || 'Dirección',
+      street: values.street.trim(),
+      city: values.city.trim(),
+      reference: values.reference.trim() || undefined,
     }
     if (editingId) updateAddress(editingId, input)
     else addAddress(input)
     close()
-  }
+  })
 
-  return {
-    open,
-    editing: editingId !== null,
-    form,
-    setField,
-    isValid,
-    openCreate,
-    openEdit,
-    close,
-    submit,
-  }
+  return { form, open, editing: editingId !== null, openCreate, openEdit, close, onSubmit }
 }
