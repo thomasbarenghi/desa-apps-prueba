@@ -1,90 +1,80 @@
-import { VStack } from "@chakra-ui/react"
-import { Muted, PageHeader, PasswordField, PrimaryButton, TextField, TextLink } from "@repo/components"
-import { routes } from "../../routes"
-import { useRegister } from "./hooks/useRegister"
+import { VStack } from '@chakra-ui/react'
+import { FormProvider } from 'react-hook-form'
+import {
+  FormField,
+  FormPasswordField,
+  Muted,
+  PageHeader,
+  PrimaryButton,
+  TextLink,
+} from '@repo/components'
+import { routes } from '../../routes'
+import { useRegister } from './hooks/useRegister'
 
 export const RegisterPage = () => {
-  const {
-    firstName,
-    setFirstName,
-    lastName,
-    setLastName,
-    email,
-    setEmail,
-    phone,
-    setPhone,
-    password,
-    setPassword,
-    confirm,
-    setConfirm,
-    passwordsMatch,
-    submitting,
-    isValid,
-    onSubmit,
-  } = useRegister()
+  const { form, submitting, onSubmit } = useRegister()
 
   return (
     <VStack gap="8" align="stretch">
       <PageHeader title="Creá tu cuenta" description="Sumate y pedí en minutos." />
 
       <form onSubmit={onSubmit}>
-        <VStack gap="4" align="stretch">
-          <TextField
-            label="Nombre"
-            required
-            value={firstName}
-            onChange={(e) => setFirstName(e.target.value)}
-            placeholder="Juan"
-            autoComplete="given-name"
-          />
-          <TextField
-            label="Apellido"
-            required
-            value={lastName}
-            onChange={(e) => setLastName(e.target.value)}
-            placeholder="Pérez"
-            autoComplete="family-name"
-          />
-          <TextField
-            label="Email"
-            required
-            type="email"
-            autoComplete="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            placeholder="juan.perez@unahur.edu.ar"
-          />
-          <TextField
-            label="Teléfono"
-            required
-            type="tel"
-            autoComplete="tel"
-            value={phone}
-            onChange={(e) => setPhone(e.target.value)}
-            placeholder="+54 11 5555-1234"
-          />
-          <PasswordField
-            label="Contraseña"
-            required
-            autoComplete="new-password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            placeholder="Mínimo 6 caracteres"
-          />
-          <PasswordField
-            label="Repetir contraseña"
-            required
-            invalid={!passwordsMatch}
-            errorText={!passwordsMatch ? "Las contraseñas no coinciden." : undefined}
-            autoComplete="new-password"
-            value={confirm}
-            onChange={(e) => setConfirm(e.target.value)}
-            placeholder="Repetí tu contraseña"
-          />
-          <PrimaryButton type="submit" disabled={!isValid || submitting} loading={submitting} marginTop="2">
-            Crear cuenta
-          </PrimaryButton>
-        </VStack>
+        <FormProvider {...form}>
+          <VStack gap="4" align="stretch">
+            <FormField
+              name="firstName"
+              label="Nombre"
+              required
+              autoComplete="given-name"
+              placeholder="Juan"
+            />
+            <FormField
+              name="lastName"
+              label="Apellido"
+              required
+              autoComplete="family-name"
+              placeholder="Pérez"
+            />
+            <FormField
+              name="email"
+              label="Email"
+              required
+              type="email"
+              autoComplete="email"
+              placeholder="juan.perez@unahur.edu.ar"
+            />
+            <FormField
+              name="phone"
+              label="Teléfono"
+              required
+              type="tel"
+              autoComplete="tel"
+              placeholder="+54 11 5555-1234"
+            />
+            <FormPasswordField
+              name="password"
+              label="Contraseña"
+              required
+              autoComplete="new-password"
+              placeholder="Mínimo 6 caracteres"
+            />
+            <FormPasswordField
+              name="confirm"
+              label="Repetir contraseña"
+              required
+              autoComplete="new-password"
+              placeholder="Repetí tu contraseña"
+            />
+            <PrimaryButton
+              type="submit"
+              disabled={!form.formState.isValid || submitting}
+              loading={submitting}
+              marginTop="2"
+            >
+              Crear cuenta
+            </PrimaryButton>
+          </VStack>
+        </FormProvider>
       </form>
 
       <Muted fontSize="sm" textAlign="center">

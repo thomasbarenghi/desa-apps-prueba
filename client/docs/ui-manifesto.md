@@ -204,7 +204,7 @@ Dos contenedores de página, unificados en `@repo/components`. **Ninguna página
 |---|---|
 | Tipografía | `PageTitle`, `SectionTitle`, `PageHeader`, `Eyebrow`, `Lead`, `Strong`, `Muted`, `Subtle`, `Price`, `TextLink` |
 | Botones | `PrimaryButton`, `SecondaryButton`, `InverseButton`, `GhostButton`, `OutlineButton` |
-| Formularios | `TextField`, `PasswordField`, `TextAreaField`, `PasswordInput`, `SearchInput` |
+| Formularios | `TextField`, `PasswordField`, `TextAreaField`, `PasswordInput`, `SearchInput` + `FormField`, `FormPasswordField`, `FormTextAreaField` (React Hook Form) |
 | Layout | `PageContainer`, `WidePageContainer`, `Footer`, `ResponsiveModal` (dialog + bottom-sheet), `SidePanel` |
 | Navegación | `MobileNav`, `ChipCarousel` |
 | Feedback | `EmptyState`, `AuthSuccess`, `SplashScreen` |
@@ -213,6 +213,7 @@ Dos contenedores de página, unificados en `@repo/components`. **Ninguna página
 
 - **Botones** ya traen `size`/`radius`/colores; solo `children` + props semánticas (`asChild`, `type`, `disabled`, `loading`, `width`, `onClick`). No re-estilizar.
 - **Campos** (`TextField`/`PasswordField`/`TextAreaField`) ya traen `size="lg"`, `borderRadius="xl"`, `bg="bg.panel"` y el patrón de validación (`required` + `invalid` + `errorText`).
+- **Validación de formularios:** React Hook Form + Zod + `@hookform/resolvers`. Los schemas viven en `@repo/domain` (`schemas.ts`) y se comparten entre apps. Patrón: `useForm` + `zodResolver(schema)` (mode `onTouched`) en el hook, `<FormProvider {...form}>` + `FormField`/`FormPasswordField`/`FormTextAreaField` en la página, y `form.handleSubmit(onValid)` como `onSubmit`. No validar a mano en `useState`.
 - **Capas:** tipos/constantes de dominio en `@repo/domain`; hooks/datos en `@repo/api`; tokens de color en `@repo/theme`.
 
 ---

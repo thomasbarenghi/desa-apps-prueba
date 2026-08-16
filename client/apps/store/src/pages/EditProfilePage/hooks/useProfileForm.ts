@@ -1,48 +1,37 @@
-import { useState } from "react"
-import { useProfile } from "@repo/api"
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import type { z } from 'zod'
+import { useProfile } from '@repo/api'
+import { profileSchema } from '@repo/domain'
+
+type ProfileValues = z.infer<typeof profileSchema>
 
 interface UseProfileFormOptions {
   userId?: number
 }
 
-interface UseProfileFormReturn {
-  values: { firstName: string; lastName: string; phone: string }
-  isDirty: boolean
-  onChange: (field: "firstName" | "lastName" | "phone", value: string) => void
-  onSave: () => void
-  onCancel: () => void
-}
+export const useProfileForm = ({ userId }: UseProfileFormOptions) => {
+  const { user, isLoading, updateProfile } = useProfile(userId)
 
-export const useProfileForm = ({ userId }: UseProfileFormOptions): UseProfileFormReturn => {
-  const { user, updateProfile } = useProfile(userId)
-  const [values, setValues] = useState({
-    firstName: user?.firstName ?? "",
-    lastName: user?.lastName ?? "",
-    phone: user?.phone ?? "",
+  const form = useForm<ProfileValues>({
+    resolver: zodResolver(profileSchema),
+    defaultValues: {
+      firstName: user?.firstName ?? '',
+      lastName: user?.lastName ?? '',
+      phone: user?.phone ?? '',
+    },
+    mode: 'onTouched',
+    reValidateMode: 'onChange',
   })
 
-  const isDirty = values.firstName !== user?.firstName || values.lastName !== user?.lastName || values.phone !== user?.phone
+  const isDirty = form.formState.isDirty
 
-  const onChange = (field: "firstName" | "lastName" | "phone", value: string) => {
-    setValues((prev) => ({ ...prev, [field]: value }))
-  }
-
-  const onSave = async () => {
+  const onSave = form.handleSubmit(async (values) => {
     await updateProfile(values)
-    setValues({
-      firstName: user?.firstName ?? "",
-      lastName: user?.lastName ?? "",
-      phone: user?.phone ?? "",
-    })
-  }
+    form.reset(values)
+  })
 
-  const onCancel = () => {
-    setValues({
-      firstName: user?.firstName ?? "",
-      lastName: user?.lastName ?? "",
-      phone: user?.phone ?? "",
-    })
-  }
+  const onCancel = () => form.reset()
 
-  return { values, isDirty, onChange, onSave, onCancel }
+  return { user, isLoading, form, isDirty, onSave, onCancel }
 }

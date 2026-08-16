@@ -1,16 +1,24 @@
-import { VStack } from "@chakra-ui/react"
-import { AuthSuccess, Muted, PageHeader, PrimaryButton, TextField, TextLink } from "@repo/components"
-import { routes } from "../../routes"
-import { useForgotPassword } from "./hooks/useForgotPassword"
+import { VStack } from '@chakra-ui/react'
+import { FormProvider } from 'react-hook-form'
+import {
+  AuthSuccess,
+  FormField,
+  Muted,
+  PageHeader,
+  PrimaryButton,
+  TextLink,
+} from '@repo/components'
+import { routes } from '../../routes'
+import { useForgotPassword } from './hooks/useForgotPassword'
 
 export const ForgotPasswordPage = () => {
-  const { email, setEmail, submitting, sent, isValid, onSubmit } = useForgotPassword()
+  const { form, submitting, sent, onSubmit } = useForgotPassword()
 
   if (sent) {
     return (
       <AuthSuccess
         title="Revisá tu email"
-        description={`Te enviamos un enlace para restablecer tu contraseña a ${email}.`}
+        description={`Te enviamos un enlace para restablecer tu contraseña a ${form.getValues('email')}.`}
         buttonLabel="Volver al login"
         to={routes.login}
       />
@@ -25,20 +33,26 @@ export const ForgotPasswordPage = () => {
       />
 
       <form onSubmit={onSubmit}>
-        <VStack gap="4" align="stretch">
-          <TextField
-            label="Email"
-            required
-            type="email"
-            autoComplete="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            placeholder="juan.perez@unahur.edu.ar"
-          />
-          <PrimaryButton type="submit" disabled={!isValid || submitting} loading={submitting} marginTop="2">
-            Enviar instrucciones
-          </PrimaryButton>
-        </VStack>
+        <FormProvider {...form}>
+          <VStack gap="4" align="stretch">
+            <FormField
+              name="email"
+              label="Email"
+              required
+              type="email"
+              autoComplete="email"
+              placeholder="juan.perez@unahur.edu.ar"
+            />
+            <PrimaryButton
+              type="submit"
+              disabled={!form.formState.isValid || submitting}
+              loading={submitting}
+              marginTop="2"
+            >
+              Enviar instrucciones
+            </PrimaryButton>
+          </VStack>
+        </FormProvider>
       </form>
 
       <Muted fontSize="sm" textAlign="center">

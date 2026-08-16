@@ -72,10 +72,8 @@ export const AddressesPage = () => {
         open={form.open}
         editing={form.editing}
         form={form.form}
-        setField={form.setField}
-        isValid={form.isValid}
         onClose={form.close}
-        onSubmit={form.submit}
+        onSubmit={form.onSubmit}
       />
     </PageContainer>
   )

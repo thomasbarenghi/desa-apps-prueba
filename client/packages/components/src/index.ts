@@ -63,6 +63,15 @@ export type { PasswordFieldProps } from "./PasswordField/types"
 export { TextField } from "./TextField"
 export type { TextFieldProps } from "./TextField/types"
 
+export { FormField } from "./FormField"
+export type { FormFieldProps } from "./FormField/types"
+
+export { FormPasswordField } from "./FormPasswordField"
+export type { FormPasswordFieldProps } from "./FormPasswordField/types"
+
+export { FormTextAreaField } from "./FormTextAreaField"
+export type { FormTextAreaFieldProps } from "./FormTextAreaField/types"
+
 export { TextAreaField } from "./TextAreaField"
 export type { TextAreaFieldProps } from "./TextAreaField/types"
 

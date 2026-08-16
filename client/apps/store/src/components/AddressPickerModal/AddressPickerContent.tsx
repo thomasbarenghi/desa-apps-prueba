@@ -1,25 +1,15 @@
-import { Box, Button, Heading, VStack } from "@chakra-ui/react"
-import ChevronRight from "@gravity-ui/icons/ChevronRight"
-import GeoPin from "@gravity-ui/icons/GeoPin"
-import Plus from "@gravity-ui/icons/Plus"
-import { GhostButton, Muted, Strong, Subtle } from "@repo/components"
-import { AddressForm } from "./AddressForm"
-import type { UseAddressPickerReturn } from "./hooks/useAddressPicker"
+import { Box, Button, Heading, VStack } from '@chakra-ui/react'
+import ChevronRight from '@gravity-ui/icons/ChevronRight'
+import GeoPin from '@gravity-ui/icons/GeoPin'
+import Plus from '@gravity-ui/icons/Plus'
+import { GhostButton, Muted, Strong, Subtle } from '@repo/components'
+import { AddressForm } from './AddressForm'
+import type { UseAddressPickerReturn } from './hooks/useAddressPicker'
 
 type AddressPickerContentProps = UseAddressPickerReturn
 
 export const AddressPickerContent = (props: AddressPickerContentProps) => {
-  const {
-    addresses,
-    showForm,
-    form,
-    setField,
-    isFormValid,
-    handleSelect,
-    handleAdd,
-    openForm,
-    closeForm,
-  } = props
+  const { addresses, showForm, form, handleSelect, handleAdd, openForm, closeForm } = props
 
   const hasSavedAddresses = addresses.length > 0
 
@@ -40,20 +30,18 @@ export const AddressPickerContent = (props: AddressPickerContentProps) => {
           <GeoPin width={22} height={22} />
         </Box>
         <Heading as="h2" fontSize="xl" fontWeight="bold">
-          {showForm ? "Cargá tu dirección" : "¿A dónde te lo llevamos?"}
+          {showForm ? 'Cargá tu dirección' : '¿A dónde te lo llevamos?'}
         </Heading>
         <Muted fontSize="sm">
           {showForm
-            ? "Contanos dónde estás para llevarte el pedido."
-            : "Elegí una de tus direcciones guardadas."}
+            ? 'Contanos dónde estás para llevarte el pedido.'
+            : 'Elegí una de tus direcciones guardadas.'}
         </Muted>
       </VStack>
 
       {showForm ? (
         <AddressForm
           form={form}
-          setField={setField}
-          isValid={isFormValid}
           onSubmit={handleAdd}
           onBack={hasSavedAddresses ? closeForm : undefined}
         />
@@ -72,7 +60,7 @@ export const AddressPickerContent = (props: AddressPickerContentProps) => {
               paddingX="4"
               paddingY="3.5"
               gap="3"
-              _hover={{ borderColor: "border.emphasized", bg: "bg.muted" }}
+              _hover={{ borderColor: 'border.emphasized', bg: 'bg.muted' }}
               onClick={() => handleSelect(address.id)}
             >
               <Box flex="1" minWidth="0">

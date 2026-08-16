@@ -1,33 +1,28 @@
-import { useState } from "react"
-import type { FormEvent } from "react"
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { useState } from 'react'
+import type { z } from 'zod'
+import { resetPasswordSchema } from '@repo/domain'
+
+type ResetPasswordValues = z.infer<typeof resetPasswordSchema>
 
 export const useResetPassword = () => {
-  const [password, setPassword] = useState("")
-  const [confirm, setConfirm] = useState("")
   const [submitting, setSubmitting] = useState(false)
   const [done, setDone] = useState(false)
 
-  const passwordsMatch = password === confirm
-  const isValid = password.length >= 6 && passwordsMatch
+  const form = useForm<ResetPasswordValues>({
+    resolver: zodResolver(resetPasswordSchema),
+    defaultValues: { password: '', confirm: '' },
+    mode: 'onTouched',
+    reValidateMode: 'onChange',
+  })
 
-  const onSubmit = async (event?: FormEvent) => {
-    event?.preventDefault()
-    if (!isValid || submitting) return
+  const onSubmit = form.handleSubmit(async () => {
     setSubmitting(true)
     await new Promise((resolve) => setTimeout(resolve, 600))
     setSubmitting(false)
     setDone(true)
-  }
+  })
 
-  return {
-    password,
-    setPassword,
-    confirm,
-    setConfirm,
-    passwordsMatch,
-    submitting,
-    done,
-    isValid,
-    onSubmit,
-  }
+  return { form, submitting, done, onSubmit }
 }
