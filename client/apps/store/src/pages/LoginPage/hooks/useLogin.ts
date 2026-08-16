@@ -2,7 +2,7 @@ import { useState } from "react"
 import type { FormEvent } from "react"
 import { useLocation, useNavigate } from "react-router-dom"
 import { routes } from "../../../routes"
-import { useAuthStore } from "../../../stores/authStore"
+import { useAuthStore } from "@repo/api"
 
 interface LocationState {
   from?: { pathname?: string }
@@ -26,7 +26,7 @@ export const useLogin = () => {
     setSubmitting(true)
     setError(null)
     try {
-      await login(email.trim(), password)
+      await login(email.trim())
       const from = (location.state as LocationState | null)?.from?.pathname ?? routes.home
       navigate(from, { replace: true })
     } catch {

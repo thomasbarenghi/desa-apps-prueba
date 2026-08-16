@@ -1,5 +1,5 @@
 import { useState } from "react"
-import { useProfile } from "../../../hooks/useProfile"
+import { useProfile } from "@repo/api"
 
 interface UseProfileFormOptions {
   userId?: number

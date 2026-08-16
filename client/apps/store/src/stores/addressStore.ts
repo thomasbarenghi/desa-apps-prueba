@@ -1,6 +1,6 @@
 import { create } from "zustand"
 import { createJSONStorage, persist } from "zustand/middleware"
-import type { Address, AddressInput } from "../types/address"
+import type { Address, AddressInput } from "@repo/domain"
 import { MOCK_ADDRESSES } from "../utils/addresses"
 
 interface AddressState {

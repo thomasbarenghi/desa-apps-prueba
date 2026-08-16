@@ -1,4 +1,4 @@
-import type { Address } from "../types/address"
+import type { Address } from "@repo/domain"
 
 export const MOCK_ADDRESSES: Address[] = [
   {

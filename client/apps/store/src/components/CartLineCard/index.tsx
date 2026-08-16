@@ -1,8 +1,8 @@
-import { Button, HStack, Image, Text, VStack } from "@chakra-ui/react"
+import { HStack, Image, VStack } from "@chakra-ui/react"
 import TrashBin from "@gravity-ui/icons/TrashBin"
 import { lineTotal, lineUnitPrice } from "../../stores/cartStore"
-import { formatPrice } from "../../utils/catalog"
-import { QuantityStepper } from "../QuantityStepper"
+import { formatPrice } from "@repo/domain"
+import { GhostButton, Muted, Price, QuantityStepper, Strong, Subtle } from "@repo/components"
 import type { CartLineCardProps } from "./types"
 
 export const CartLineCard = ({ line, onQuantityChange, onRemove }: CartLineCardProps) => {
@@ -20,25 +20,24 @@ export const CartLineCard = ({ line, onQuantityChange, onRemove }: CartLineCardP
         flexShrink={0}
       />
       <VStack align="start" gap="1" flex="1" minWidth="0">
-        <Text fontWeight="semibold" fontSize="sm" lineClamp={1}>
+        <Strong fontSize="sm" lineClamp={1}>
           {line.name}
-        </Text>
+        </Strong>
         {optionsLabel ? (
-          <Text color="fg.muted" fontSize="xs" lineClamp={2}>
+          <Muted fontSize="xs" lineClamp={2}>
             {optionsLabel}
-          </Text>
+          </Muted>
         ) : null}
         {line.notes ? (
-          <Text color="fg.subtle" fontSize="xs" lineClamp={1}>
+          <Subtle fontSize="xs" lineClamp={1}>
             Nota: {line.notes}
-          </Text>
+          </Subtle>
         ) : null}
-        <Text color="fg.muted" fontSize="xs" fontVariantNumeric="tabular-nums">
+        <Muted fontSize="xs" fontVariantNumeric="tabular-nums">
           {formatPrice(lineUnitPrice(line))} c/u
-        </Text>
-        <Button
+        </Muted>
+        <GhostButton
           size="2xs"
-          variant="ghost"
           color="fg.subtle"
           paddingX="0"
           _hover={{ color: "danger" }}
@@ -46,12 +45,10 @@ export const CartLineCard = ({ line, onQuantityChange, onRemove }: CartLineCardP
         >
           <TrashBin width={14} height={14} />
           Eliminar
-        </Button>
+        </GhostButton>
       </VStack>
       <VStack align="end" gap="2">
-        <Text fontWeight="semibold" fontVariantNumeric="tabular-nums">
-          {formatPrice(lineTotal(line))}
-        </Text>
+        <Price>{formatPrice(lineTotal(line))}</Price>
         <QuantityStepper
           value={line.quantity}
           onChange={(value) => onQuantityChange(line.id, value)}

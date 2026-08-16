@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react"
 import { useAddressStore } from "../../../stores/addressStore"
-import type { Address, AddressInput } from "../../../types/address"
+import type { Address, AddressInput } from "@repo/domain"
 import type { AddressPickerForm } from "../types"
 
 const EMPTY_FORM: AddressPickerForm = {

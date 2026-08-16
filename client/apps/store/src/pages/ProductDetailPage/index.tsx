@@ -1,23 +1,23 @@
+import { Box, Button, Grid, HStack, Image, Skeleton, Text, VStack } from '@chakra-ui/react'
+import Check from '@gravity-ui/icons/Check'
+import { Link, useNavigate, useParams } from 'react-router-dom'
 import {
-  Box,
-  Button,
-  Grid,
-  HStack,
-  Heading,
-  Image,
-  Skeleton,
-  Text,
-  Textarea,
-  VStack,
-} from "@chakra-ui/react"
-import Check from "@gravity-ui/icons/Check"
-import { Link, useNavigate, useParams } from "react-router-dom"
-import { BackButton } from "../../components/BackButton"
-import { EmptyState } from "../../components/EmptyState"
-import { QuantityStepper } from "../../components/QuantityStepper"
-import { routes } from "../../routes"
-import { formatPrice, getCategoryName } from "../../utils/catalog"
-import { useProductConfig } from "./hooks/useProductConfig"
+  BackButton,
+  Muted,
+  PageTitle,
+  Price,
+  PrimaryButton,
+  Strong,
+  Subtle,
+  TextAreaField,
+  WidePageContainer,
+} from '@repo/components'
+import { EmptyState } from '@repo/components'
+import { QuantityStepper } from '@repo/components'
+import { routes } from '../../routes'
+import { formatPrice } from '@repo/domain'
+import { getCategoryName } from '@repo/api'
+import { useProductConfig } from './hooks/useProductConfig'
 
 export const ProductDetailPage = () => {
   const { productId } = useParams()
@@ -26,7 +26,7 @@ export const ProductDetailPage = () => {
 
   if (config.isLoading) {
     return (
-      <Grid templateColumns={{ base: "1fr", md: "1fr 1fr" }} gap="8">
+      <Grid templateColumns={{ base: '1fr', md: '1fr 1fr' }} gap="8">
         <Skeleton height="360px" borderRadius="2xl" />
         <VStack gap="4" align="stretch">
           <Skeleton height="40px" width="60%" />
@@ -44,9 +44,9 @@ export const ProductDetailPage = () => {
         title="Producto no encontrado"
         description="El producto que buscás no existe o ya no está disponible."
         action={
-          <Button asChild bg="brand.600" color="white" borderRadius="full">
+          <PrimaryButton asChild>
             <Link to={routes.catalog}>Volver al catálogo</Link>
-          </Button>
+          </PrimaryButton>
         }
       />
     )
@@ -56,30 +56,38 @@ export const ProductDetailPage = () => {
   const categoryName = getCategoryName(product.categoryId)
 
   return (
-    <VStack align="stretch" gap="6">
+    <WidePageContainer>
       <BackButton />
 
-      <Grid templateColumns={{ base: "1fr", md: "1fr 1fr" }} gap={{ base: "6", md: "10" }} alignItems="start">
-        <Box position={{ md: "sticky" }} top="24">
+      <Grid
+        templateColumns={{ base: '1fr', md: '1fr 1fr' }}
+        gap={{ base: '6', md: '10' }}
+        alignItems="start"
+      >
+        <Box position={{ md: 'sticky' }} top="24">
           <Box borderRadius="2xl" overflow="hidden" aspectRatio="1 / 1" bg="bg.muted">
-            <Image src={product.image} alt={product.name} width="100%" height="100%" objectFit="cover" />
+            <Image
+              src={product.image}
+              alt={product.name}
+              width="100%"
+              height="100%"
+              objectFit="cover"
+            />
           </Box>
         </Box>
 
         <VStack align="stretch" gap="6">
           <VStack align="start" gap="2">
             {categoryName ? (
-              <Text color="brand.600" fontWeight="semibold" fontSize="sm">
+              <Strong color="brand.600" fontSize="sm">
                 {categoryName}
-              </Text>
+              </Strong>
             ) : null}
-            <Heading as="h1" fontSize={{ base: "3xl", md: "4xl" }} fontWeight="bold" lineHeight="1.1" textWrap="balance">
+            <PageTitle lineHeight="1.1" textWrap="balance">
               {product.name}
-            </Heading>
-            <Text color="fg.muted">{product.description}</Text>
-            <Text fontWeight="semibold" fontSize="xl" fontVariantNumeric="tabular-nums">
-              {formatPrice(product.price)}
-            </Text>
+            </PageTitle>
+            <Muted>{product.description}</Muted>
+            <Price fontSize="xl">{formatPrice(product.price)}</Price>
           </VStack>
 
           {product.configGroups.map((group) => (
@@ -94,40 +102,37 @@ export const ProductDetailPage = () => {
             />
           ))}
 
-          <VStack align="start" gap="2">
-            <Text fontWeight="semibold">Observaciones</Text>
-            <Textarea
-              value={config.notes}
-              onChange={(e) => config.setNotes(e.target.value)}
-              placeholder="Sin cebolla, extra salsa, etc."
-              bg="bg.panel"
-              borderRadius="xl"
-            />
-          </VStack>
+          <TextAreaField
+            label="Observaciones"
+            value={config.notes}
+            onChange={(e) => config.setNotes(e.target.value)}
+            placeholder="Sin cebolla, extra salsa, etc."
+          />
 
-          <Box bg="bg.subtle" border="1px solid" borderColor="border.subtle" borderRadius="2xl" padding="5">
+          <Box
+            bg="bg.subtle"
+            border="1px solid"
+            borderColor="border.subtle"
+            borderRadius="2xl"
+            padding="5"
+          >
             <HStack justify="space-between" marginBottom="4">
-              <Text fontWeight="semibold">Cantidad</Text>
+              <Strong>Cantidad</Strong>
               <QuantityStepper value={config.quantity} onChange={config.setQuantity} />
             </HStack>
             <HStack justify="space-between" marginBottom="4">
-              <Text color="fg.muted">Total del ítem</Text>
-              <Text fontWeight="bold" fontSize="xl" fontVariantNumeric="tabular-nums">
+              <Muted>Total del ítem</Muted>
+              <Price fontWeight="bold" fontSize="xl">
                 {formatPrice(config.total)}
-              </Text>
+              </Price>
             </HStack>
             {config.missingRequired ? (
               <Text color="danger" fontSize="sm" marginBottom="3">
                 Seleccioná las opciones obligatorias para continuar.
               </Text>
             ) : null}
-            <Button
+            <PrimaryButton
               width="full"
-              size="lg"
-              borderRadius="full"
-              bg="brand.600"
-              color="white"
-              _hover={{ bg: "brand.700" }}
               disabled={!config.canAdd}
               onClick={() => {
                 config.addToCart()
@@ -135,18 +140,18 @@ export const ProductDetailPage = () => {
               }}
             >
               Agregar al carrito
-            </Button>
+            </PrimaryButton>
           </Box>
         </VStack>
       </Grid>
-    </VStack>
+    </WidePageContainer>
   )
 }
 
 interface ConfigGroupProps {
   title: string
   required: boolean
-  type: "single" | "multiple"
+  type: 'single' | 'multiple'
   options: { id: number; name: string; priceDelta: number }[]
   selected: number | number[] | undefined
   onSelect: (optionId: number) => void
@@ -159,15 +164,13 @@ const ConfigGroup = ({ title, required, type, options, selected, onSelect }: Con
   return (
     <Box>
       <HStack gap="2" marginBottom="2">
-        <Text fontWeight="semibold">{title}</Text>
+        <Strong>{title}</Strong>
         {required ? (
-          <Text color="brand.600" fontSize="xs" fontWeight="semibold">
+          <Strong color="brand.600" fontSize="xs">
             Requerido
-          </Text>
+          </Strong>
         ) : (
-          <Text color="fg.subtle" fontSize="xs">
-            Opcional
-          </Text>
+          <Subtle fontSize="xs">Opcional</Subtle>
         )}
       </HStack>
       <VStack gap="2" align="stretch">
@@ -183,40 +186,33 @@ const ConfigGroup = ({ title, required, type, options, selected, onSelect }: Con
               paddingX="4"
               paddingY="3"
               border="1px solid"
-              borderColor={selectedOption ? "brand.500" : "border.subtle"}
-              bg={selectedOption ? "brand.50" : "bg.panel"}
-              _hover={{ bg: selectedOption ? "brand.50" : "bg.muted" }}
+              borderColor={selectedOption ? 'brand.500' : 'border.subtle'}
+              bg={selectedOption ? 'brand.50' : 'bg.panel'}
+              _hover={{ bg: selectedOption ? 'brand.50' : 'bg.muted' }}
               onClick={() => onSelect(option.id)}
             >
               <HStack gap="2.5">
                 <Box
                   width="18px"
                   height="18px"
-                  borderRadius={type === "single" ? "full" : "sm"}
+                  borderRadius={type === 'single' ? 'full' : 'sm'}
                   border="1.5px solid"
-                  borderColor={selectedOption ? "brand.500" : "border.emphasized"}
+                  borderColor={selectedOption ? 'brand.500' : 'border.emphasized'}
                   display="flex"
                   alignItems="center"
                   justifyContent="center"
-                  bg={selectedOption ? "brand.500" : "transparent"}
+                  bg={selectedOption ? 'brand.500' : 'transparent'}
                   color="white"
                 >
-                  {selectedOption && type === "multiple" ? (
-                    <Check width={12} height={12} />
-                  ) : null}
+                  {selectedOption && type === 'multiple' ? <Check width={12} height={12} /> : null}
                 </Box>
-                <Text fontWeight="medium" color={selectedOption ? "fg" : "fg.muted"}>
+                <Text fontWeight="medium" color={selectedOption ? 'fg' : 'fg.muted'}>
                   {option.name}
                 </Text>
               </HStack>
-              <Text
-                color={option.priceDelta > 0 ? "brand.600" : "fg.subtle"}
-                fontWeight="semibold"
-                fontSize="sm"
-                fontVariantNumeric="tabular-nums"
-              >
-                {option.priceDelta > 0 ? `+ ${formatPrice(option.priceDelta)}` : "Sin cargo"}
-              </Text>
+              <Price color={option.priceDelta > 0 ? 'brand.600' : 'fg.subtle'} fontSize="sm">
+                {option.priceDelta > 0 ? `+ ${formatPrice(option.priceDelta)}` : 'Sin cargo'}
+              </Price>
             </Button>
           )
         })}

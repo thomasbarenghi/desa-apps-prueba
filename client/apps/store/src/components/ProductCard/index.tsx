@@ -1,8 +1,9 @@
-import { Box, HStack, IconButton, Image, Link as ChakraLink, Text } from "@chakra-ui/react"
+import { Box, HStack, IconButton, Image, Link as ChakraLink } from "@chakra-ui/react"
 import Plus from "@gravity-ui/icons/Plus"
 import { NavLink } from "react-router-dom"
 import { productPath } from "../../routes"
-import { formatPrice } from "../../utils/catalog"
+import { formatPrice } from "@repo/domain"
+import { Muted, Price, Strong } from "@repo/components"
 import type { ProductCardProps } from "./types"
 
 export const ProductCard = ({ product }: ProductCardProps) => {
@@ -34,20 +35,16 @@ export const ProductCard = ({ product }: ProductCardProps) => {
       <Box padding="4" paddingBottom="0">
         <ChakraLink asChild display="block">
           <NavLink to={productPath(product.id)}>
-            <Text fontWeight="semibold" fontSize="md" color="fg">
-              {product.name}
-            </Text>
-            <Text color="fg.muted" fontSize="sm" lineClamp={1} marginTop="0.5">
+            <Strong color="fg">{product.name}</Strong>
+            <Muted fontSize="sm" lineClamp={1} marginTop="0.5">
               {product.description}
-            </Text>
+            </Muted>
           </NavLink>
         </ChakraLink>
       </Box>
 
       <HStack padding="4" paddingTop="3" justify="space-between" align="center">
-        <Text fontWeight="semibold" color="fg" fontVariantNumeric="tabular-nums">
-          {formatPrice(product.price)}
-        </Text>
+        <Price color="fg">{formatPrice(product.price)}</Price>
         <IconButton
           asChild
           aria-label={`Ver ${product.name}`}

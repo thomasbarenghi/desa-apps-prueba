@@ -1,14 +1,24 @@
-import { Badge, Box, Button, Heading, HStack, Text, VStack } from "@chakra-ui/react"
-import GeoPin from "@gravity-ui/icons/GeoPin"
-import PencilToSquare from "@gravity-ui/icons/PencilToSquare"
-import Plus from "@gravity-ui/icons/Plus"
-import TrashBin from "@gravity-ui/icons/TrashBin"
-import { BackButton } from "../../components/BackButton"
-import { EmptyState } from "../../components/EmptyState"
-import { useAddressStore } from "../../stores/addressStore"
-import type { Address } from "../../types/address"
-import { AddressFormDialog } from "./AddressFormDialog"
-import { useAddressForm } from "./hooks/useAddressForm"
+import { Badge, Box, HStack, VStack } from '@chakra-ui/react'
+import GeoPin from '@gravity-ui/icons/GeoPin'
+import PencilToSquare from '@gravity-ui/icons/PencilToSquare'
+import Plus from '@gravity-ui/icons/Plus'
+import TrashBin from '@gravity-ui/icons/TrashBin'
+import {
+  BackButton,
+  GhostButton,
+  Muted,
+  OutlineButton,
+  PageContainer,
+  PageTitle,
+  PrimaryButton,
+  Strong,
+  Subtle,
+} from '@repo/components'
+import { EmptyState } from '@repo/components'
+import { useAddressStore } from '../../stores/addressStore'
+import type { Address } from '@repo/domain'
+import { AddressFormDialog } from './AddressFormDialog'
+import { useAddressForm } from './hooks/useAddressForm'
 
 export const AddressesPage = () => {
   const addresses = useAddressStore((state) => state.addresses)
@@ -18,29 +28,24 @@ export const AddressesPage = () => {
   const form = useAddressForm()
 
   return (
-    <VStack align="stretch" gap="6" maxW="2xl" marginX="auto">
+    <PageContainer>
       <BackButton />
       <VStack align="start" gap="1">
-        <Heading as="h1" fontSize={{ base: "3xl", md: "4xl" }} fontWeight="bold">
-          Mis direcciones
-        </Heading>
-        <Text color="fg.muted">Administrá las direcciones a las que te llevamos el pedido.</Text>
+        <PageTitle>Mis direcciones</PageTitle>
+        <Muted>Administrá las direcciones a las que te llevamos el pedido.</Muted>
       </VStack>
 
-      <Button
-        variant="outline"
+      <OutlineButton
         width="full"
         height="auto"
         borderRadius="xl"
         paddingY="3.5"
-        borderColor="border.subtle"
         color="brand.600"
-        _hover={{ borderColor: "border.emphasized", bg: "bg.muted" }}
         onClick={form.openCreate}
       >
         <Plus width={16} height={16} />
         Agregar dirección
-      </Button>
+      </OutlineButton>
 
       {addresses.length === 0 ? (
         <EmptyState
@@ -72,7 +77,7 @@ export const AddressesPage = () => {
         onClose={form.close}
         onSubmit={form.submit}
       />
-    </VStack>
+    </PageContainer>
   )
 }
 
@@ -86,14 +91,24 @@ interface AddressCardProps {
 
 const AddressCard = ({ address, selected, onSelect, onEdit, onDelete }: AddressCardProps) => {
   return (
-    <Box bg="bg.panel" border="1px solid" borderColor="border.subtle" borderRadius="2xl" padding="5">
+    <Box
+      bg="bg.panel"
+      border="1px solid"
+      borderColor="border.subtle"
+      borderRadius="2xl"
+      padding="5"
+    >
       <HStack justify="space-between" marginBottom="1">
         <HStack gap="2">
-          <Text fontWeight="semibold" fontSize="lg">
-            {address.label}
-          </Text>
+          <Strong fontSize="lg">{address.label}</Strong>
           {selected ? (
-            <Badge colorPalette="orange" variant="subtle" borderRadius="full" paddingX="2.5" paddingY="1">
+            <Badge
+              colorPalette="orange"
+              variant="subtle"
+              borderRadius="full"
+              paddingX="2.5"
+              paddingY="1"
+            >
               Actual
             </Badge>
           ) : null}
@@ -102,49 +117,26 @@ const AddressCard = ({ address, selected, onSelect, onEdit, onDelete }: AddressC
           <GeoPin width={20} height={20} />
         </Box>
       </HStack>
-      <Text color="fg.muted" fontSize="sm">
-        {address.street}
-      </Text>
-      <Text color="fg.subtle" fontSize="sm">
+      <Muted fontSize="sm">{address.street}</Muted>
+      <Subtle fontSize="sm">
         {address.city}
-        {address.reference ? ` · ${address.reference}` : ""}
-      </Text>
+        {address.reference ? ` · ${address.reference}` : ''}
+      </Subtle>
 
       <HStack gap="2" marginTop="4" flexWrap="wrap">
         {!selected ? (
-          <Button
-            size="sm"
-            borderRadius="full"
-            bg="brand.600"
-            color="white"
-            _hover={{ bg: "brand.700" }}
-            onClick={onSelect}
-          >
+          <PrimaryButton size="sm" onClick={onSelect}>
             Usar esta
-          </Button>
+          </PrimaryButton>
         ) : null}
-        <Button
-          size="sm"
-          variant="outline"
-          borderRadius="full"
-          borderColor="border.subtle"
-          _hover={{ borderColor: "border.emphasized", bg: "bg.muted" }}
-          onClick={onEdit}
-        >
+        <OutlineButton size="sm" onClick={onEdit}>
           <PencilToSquare width={14} height={14} />
           Editar
-        </Button>
-        <Button
-          size="sm"
-          variant="ghost"
-          borderRadius="full"
-          color="danger"
-          _hover={{ bg: "bg.muted" }}
-          onClick={onDelete}
-        >
+        </OutlineButton>
+        <GhostButton size="sm" color="danger" onClick={onDelete}>
           <TrashBin width={14} height={14} />
           Eliminar
-        </Button>
+        </GhostButton>
       </HStack>
     </Box>
   )

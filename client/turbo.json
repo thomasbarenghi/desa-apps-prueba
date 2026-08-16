@@ -11,9 +11,10 @@
       "dependsOn": ["^lint"]
     },
     "check-types": {
-      "dependsOn": ["^check-types"]
+      "dependsOn": ["^build"]
     },
     "dev": {
+      "dependsOn": ["^dev"],
       "cache": false,
       "persistent": true
     }

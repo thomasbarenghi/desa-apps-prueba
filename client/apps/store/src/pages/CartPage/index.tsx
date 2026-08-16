@@ -1,11 +1,19 @@
-import { Box, Button, Grid, Heading, HStack, Text, VStack } from "@chakra-ui/react"
-import ShoppingCart from "@gravity-ui/icons/ShoppingCart"
-import { Link } from "react-router-dom"
-import { CartLineCard } from "../../components/CartLineCard"
-import { EmptyState } from "../../components/EmptyState"
-import { routes } from "../../routes"
-import { cartItemCount, cartTotal, useCartStore } from "../../stores/cartStore"
-import { formatPrice } from "../../utils/catalog"
+import { Box, Grid, HStack, VStack } from '@chakra-ui/react'
+import ShoppingCart from '@gravity-ui/icons/ShoppingCart'
+import { Link } from 'react-router-dom'
+import { CartLineCard } from '../../components/CartLineCard'
+import {
+  EmptyState,
+  Muted,
+  PageTitle,
+  Price,
+  PrimaryButton,
+  Subtle,
+  WidePageContainer,
+} from '@repo/components'
+import { routes } from '../../routes'
+import { cartItemCount, cartTotal, useCartStore } from '../../stores/cartStore'
+import { formatPrice } from '@repo/domain'
 
 export const CartPage = () => {
   const lines = useCartStore((state) => state.lines)
@@ -22,34 +30,37 @@ export const CartPage = () => {
         title="Tu carrito está vacío"
         description="Explorá el catálogo y armá tu pedido."
         action={
-          <Button asChild bg="brand.600" color="white" borderRadius="full" _hover={{ bg: "brand.700" }}>
+          <PrimaryButton asChild>
             <Link to={routes.catalog}>Explorar productos</Link>
-          </Button>
+          </PrimaryButton>
         }
       />
     )
   }
 
   return (
-    <VStack align="stretch" gap="6">
+    <WidePageContainer>
       <VStack align="start" gap="1">
-        <Heading as="h1" fontSize={{ base: "3xl", md: "4xl" }} fontWeight="bold">
-          Mi carrito
-        </Heading>
-        <Text color="fg.muted">
-          {count} {count === 1 ? "ítem" : "ítems"}
-        </Text>
+        <PageTitle>Mi carrito</PageTitle>
+        <Muted>
+          {count} {count === 1 ? 'ítem' : 'ítems'}
+        </Muted>
       </VStack>
 
-      <Grid templateColumns={{ base: "1fr", md: "2fr 1fr" }} gap="6" alignItems="start">
+      <Grid templateColumns={{ base: '1fr', md: '2fr 1fr' }} gap="6" alignItems="start">
         <VStack gap="3" align="stretch">
           {lines.map((line) => (
-            <CartLineCard key={line.id} line={line} onQuantityChange={setQuantity} onRemove={removeLine} />
+            <CartLineCard
+              key={line.id}
+              line={line}
+              onQuantityChange={setQuantity}
+              onRemove={removeLine}
+            />
           ))}
         </VStack>
 
         <Box
-          position={{ md: "sticky" }}
+          position={{ md: 'sticky' }}
           top="24"
           bg="bg.subtle"
           border="1px solid"
@@ -59,28 +70,20 @@ export const CartPage = () => {
         >
           <VStack gap="4" align="stretch">
             <HStack justify="space-between">
-              <Text color="fg.muted">Total</Text>
-              <Text fontWeight="bold" fontSize="xl" fontVariantNumeric="tabular-nums">
+              <Muted>Total</Muted>
+              <Price fontWeight="bold" fontSize="xl">
                 {formatPrice(total)}
-              </Text>
+              </Price>
             </HStack>
-            <Text color="fg.subtle" fontSize="sm">
+            <Subtle fontSize="sm">
               La sucursal se asigna automáticamente. No se paga en línea.
-            </Text>
-            <Button
-              asChild
-              width="full"
-              size="lg"
-              borderRadius="full"
-              bg="brand.600"
-              color="white"
-              _hover={{ bg: "brand.700" }}
-            >
+            </Subtle>
+            <PrimaryButton asChild width="full">
               <Link to={routes.checkout}>Continuar con el pedido</Link>
-            </Button>
+            </PrimaryButton>
           </VStack>
         </Box>
       </Grid>
-    </VStack>
+    </WidePageContainer>
   )
 }

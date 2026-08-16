@@ -29,6 +29,17 @@ src/
 └── utils/
 ```
 
+## Paquetes compartidos (`packages/`)
+
+| Paquete | Uso |
+|---|---|
+| `@repo/components` | Componentes UI genéricos + UI de dominio (Logo, EmptyState, OrderStatusBadge, ...). |
+| `@repo/domain` | Tipos y constantes de dominio (Order, Address, Product, ORDER_STATUS_LABELS, formatPrice, ...). TS puro. |
+| `@repo/api` | Capa de datos: hooks SWR + adaptador REST (GraphQL a futuro) + mocks. |
+| `@repo/theme` | Tokens semánticos de Chakra (`defineConfig` → `config`). |
+| `@repo/eslint-config` | Config ESLint compartida (`base`, `react-internal`). |
+| `@repo/typescript-config` | Config TypeScript compartida (`vite.json`, `react-library.json`, `base.json`). |
+
 ## Configuración de calidad
 
 - ESLint compartido en `packages/eslint-config` (flat config, reglas para Vite + React).
@@ -53,7 +64,8 @@ npm run format       # prettier --write
 - Consumir la API desde `/api` (proxy de Vite apunta al backend).
 - No crear archivos en `agent-local/` (carpeta local del agente, no se pushea).
 - Seguir la especificación de `plan/api/base.md`.
-- **Diseño:** leer `plan/client/ui-manifesto.md` antes de tocar UI. Define la dirección visual ("Calor"), paleta, tipografía, geometría y patrones de componentes. Es la fuente de verdad visual.
+- **Diseño:** leer `client/docs/ui-manifesto.md` antes de tocar UI. Define la dirección visual ("Calor"), paleta, tipografía, geometría y patrones de componentes. Es la fuente de verdad visual.
 - Leer la skill `frontend-components` en `.claude/skills/` antes de crear o modificar componentes (estructura, named exports, SOC, Chakra siempre, Zustand, layouts).
 - Skills de diseño: `interface-design`, `better-ui` e `impeccable` en `.claude/skills/`.
-- **Tema:** los tokens semánticos viven en `apps/*/src/theme.ts`. Nunca hex sueltos en el markup; usar `bg`, `fg`, `brand.*`, `border.*`.
+- **Tema:** los tokens semánticos viven en `@repo/theme` (`packages/theme/src/config.ts`); cada app los consume en `src/theme.ts` con `createSystem(defaultConfig, config)`. Nunca hex sueltos en el markup; usar `bg`, `fg`, `brand.*`, `border.*`.
+- **Datos:** consumir los hooks de `@repo/api` (`useCatalog`, `useProfile`, `useOrder`, ...) en lugar de `fetch` directo. Los tipos de dominio van en `@repo/domain`.

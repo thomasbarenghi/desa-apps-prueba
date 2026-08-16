@@ -1,4 +1,4 @@
-import type { Product } from "../../types/catalog"
+import type { Product } from "@repo/domain"
 
 export interface ProductCardProps {
   product: Product

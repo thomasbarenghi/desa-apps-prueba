@@ -1,8 +1,8 @@
-import { Image } from "@chakra-ui/react"
-import { useLogoAsset } from "./hooks/useLogoAsset"
+import { Logo as SharedLogo } from "@repo/components"
+import logoLight from "../../assets/logo-light.svg"
+import logoDark from "../../assets/logo-dark.svg"
 import type { LogoProps } from "./types"
 
-export const Logo = ({ height = "40px", className }: LogoProps) => {
-  const src = useLogoAsset()
-  return <Image src={src} alt="UNaHur" maxHeight={height} height={height} width="auto" objectFit="contain" className={className} />
-}
+export const Logo = ({ height, className }: LogoProps) => (
+  <SharedLogo lightSrc={logoLight} darkSrc={logoDark} height={height} className={className} />
+)
