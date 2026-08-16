@@ -13,7 +13,7 @@ backend y en los contratos con las aplicaciones.
 Al confirmar un pedido, el sistema elige la **sucursal activa y abierta más cercana**
 a la dirección del cliente.
 
-Proceso (en el `OrderOrchestrator`):
+Proceso (en el `CheckoutOrchestrator`):
 
 1. Obtener las sucursales **activas**.
 2. Verificar sus **horarios de atención** (descartar cerradas en ese momento).

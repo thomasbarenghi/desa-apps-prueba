@@ -58,8 +58,9 @@ ProductController ──> ProductService ──> ProductRepository
 **Caso de uso compuesto → controller llama al orchestrator:**
 
 ```text
-OrderController ──> OrderOrchestrator ──> UserService, AddressService,
-CartService, ProductService, BranchService, ParameterService, OrderService
+CheckoutController ──> CheckoutOrchestrator ──> UserService, AddressService,
+CartService, ProductService, ProductConfigService, BranchService,
+GeneralStateService, SystemParameterService, OrderService
 ```
 
 ## Criterios para decidir
@@ -68,19 +69,6 @@ CartService, ProductService, BranchService, ParameterService, OrderService
 2. ¿El caso de uso combina dos o más módulos, o define un orden de operaciones entre servicios? → orchestrator.
 3. ¿El servicio primario necesitaría datos de otro módulo? → refactorizar: el orchestrator pide a cada servicio lo suyo y combina los resultados.
 4. ¿El controller necesitaría un repositorio? → es un error de diseño: buscar que el trabajo lo haga un servicio u orchestrator.
-
-## Estructura de módulo de ejemplo
-
-```text
-src/
-├── orders/
-│   ├── order.controller.ts
-│   ├── order-orchestrator.ts          (solo si hay caso compuesto)
-│   ├── order.service.ts
-│   ├── order.repository.ts
-│   ├── dto/
-│   └── entities/
-```
 
 ## Estructura de capas (arquitectura multicapa)
 
@@ -92,7 +80,7 @@ src/
 ├── controller/   # auth.controller.ts, order.controller.ts, ...
 ├── dto/          # DTOs por dominio
 ├── exception/    # excepciones de dominio
-├── service/      # servicios primarios + orchestrators (order.orchestrator.ts, ...)
+├── service/      # servicios primarios + orchestrators (checkout.orchestrator.ts, ...)
 ├── model/        # interfaces del DER por dominio
 ├── repository/   # order.repository.ts, ...
 └── module/       # módulos @Module de NestJS por dominio (order.module.ts, ...)

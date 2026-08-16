@@ -1,0 +1,35 @@
+import { Box, Link as ChakraLink, HStack } from "@chakra-ui/react"
+import Person from "@gravity-ui/icons/Person"
+import { NavLink } from "react-router-dom"
+import { CartButton } from "../CartButton"
+import { ColorModeButton } from "../ColorModeProvider/ColorModeButton"
+
+interface HeaderActionsProps {
+  onOpenCart: () => void
+}
+
+export const HeaderActions = ({ onOpenCart }: HeaderActionsProps) => {
+  return (
+    <HStack gap="1">
+      <Box display={{ base: "none", md: "block" }}>
+        <ColorModeButton />
+      </Box>
+      <Box display={{ base: "none", md: "block" }}>
+        <CartButton onClick={onOpenCart} />
+      </Box>
+      <ChakraLink
+        asChild
+        display={{ base: "none", md: "flex" }}
+        aria-label="Perfil"
+        padding="2"
+        borderRadius="full"
+        color="fg.muted"
+        _hover={{ color: "fg", bg: "bg.muted" }}
+      >
+        <NavLink to="/perfil">
+          <Person width={20} height={20} />
+        </NavLink>
+      </ChakraLink>
+    </HStack>
+  )
+}
