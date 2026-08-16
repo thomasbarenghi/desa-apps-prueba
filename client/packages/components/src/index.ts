@@ -14,9 +14,6 @@ export type { EmptyStateProps } from "./EmptyState/types"
 export { SectionHeader } from "./SectionHeader"
 export type { SectionHeaderProps } from "./SectionHeader/types"
 
-export { PageHeader } from "./PageHeader"
-export type { PageHeaderProps } from "./PageHeader/types"
-
 export { PageContainer } from "./PageContainer"
 export type { PageContainerProps } from "./PageContainer/types"
 
@@ -90,17 +87,11 @@ export type { ChipCarouselProps, ChipCarouselItem } from "./ChipCarousel/types"
 export { BackButton } from "./BackButton"
 export { SplashScreen } from "./SplashScreen"
 
-export { AuthSuccess } from "./AuthSuccess"
-export type { AuthSuccessProps } from "./AuthSuccess/types"
-
 export { OrderStatusBadge } from "./OrderStatusBadge"
 export type { OrderStatusBadgeProps } from "./OrderStatusBadge/types"
 
 export { OrderTimeline } from "./OrderTimeline"
 export type { OrderTimelineProps } from "./OrderTimeline/types"
-
-export { AuthLayout } from "./AuthLayout"
-export type { AuthLayoutProps } from "./AuthLayout/types"
 
 export { RequireAuth } from "./RequireAuth"
 export type { RequireAuthProps } from "./RequireAuth/types"

@@ -1,4 +1,4 @@
-const GEOAPIFY_API_KEY = "726cc536aebd41f2bbcaf33908281178"
+const GEOAPIFY_API_KEY = import.meta.env.VITE_GEOAPIFY_API_KEY ?? ""
 
 export interface StaticMapMarker {
   lat: number

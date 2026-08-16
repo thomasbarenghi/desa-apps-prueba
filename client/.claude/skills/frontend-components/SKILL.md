@@ -63,7 +63,7 @@ Los componentes, tipos, datos y tokens que van a compartir más de una app (stor
 
 | Paquete | Contenido | Ejemplos |
 |---|---|---|
-| `@repo/components` | Componentes UI genéricos + UI de dominio | `Logo`, `ColorModeProvider`, `EmptyState`, `OrderStatusBadge`, `OrderTimeline`, `AuthLayout`, `RequireAuth`, `MobileNav`, `PageHeader`, `Footer`, `PrimaryButton`/`SecondaryButton`, `Lead`, `ResponsiveModal`, `PageTitle`, `SectionTitle`, `Eyebrow`, `Strong`, `Price`, `Muted` |
+| `@repo/components` | Componentes UI genéricos + UI de dominio | `Logo`, `ColorModeProvider`, `EmptyState`, `OrderStatusBadge`, `OrderTimeline`, `RequireAuth`, `MobileNav`, `Footer`, `PrimaryButton`/`SecondaryButton`, `Lead`, `ResponsiveModal`, `PageTitle`, `SectionTitle`, `Eyebrow`, `Strong`, `Price`, `Muted` |
 | `@repo/domain` | Tipos y constantes de dominio (TS puro, sin React) | `Order`, `OrderStatus`, `Address`, `Product`, `LoginInput`, `ORDER_STATUS_LABELS`, `formatPrice` |
 | `@repo/api` | Capa de datos: hooks + adaptador (REST hoy, GraphQL mañana) + mocks + sesión | `useCatalog`, `useProfile`, `useOrder`, `useAuthStore`, `MOCK_ORDERS` |
 | `@repo/theme` | Tokens semánticos de Chakra (`defineConfig`) | `config` |
@@ -76,7 +76,7 @@ Reglas:
 - Los consumidores importan desde el barrel: `import { Logo } from "@repo/components"`.
 - **Assets de marca (logo) viven en cada app** (`apps/*/src/assets/`), no en el paquete: `Logo` recibe `lightSrc`/`darkSrc` como props. Evita que tsup rompa los imports de assets.
 - **Un mismo look = un mismo componente (tokenizar, no repetir):** antes de componer Chakra a mano, usar los tokens:
-  - Títulos: `PageTitle` (h1 de página), `SectionTitle` (h2 de sección), `PageHeader` (título + descripción de auth).
+  - Títulos: `PageTitle` (h1 de página), `SectionTitle` (h2 de sección).
   - Texto: `Eyebrow` (overline uppercase), `Lead` (párrafo lead), `Strong` (semibold), `Muted` (fg.muted), `Subtle` (fg.subtle), `Price` (semibold + tabular-nums), `TextLink` (enlace brand.600).
   - Formularios: `TextField` / `PasswordField` / `TextAreaField` (presentacionales, con `label` + `invalid` + `errorText`) y `FormField` / `FormPasswordField` / `FormTextAreaField` (integrados con React Hook Form + Zod). **Validación siempre con RHF + `zodResolver` + schemas de `@repo/domain`**, nunca `useState` a mano. Patrón: `useForm` en el hook, `FormProvider` + `FormField` en la página, `form.handleSubmit(onValid)` como `onSubmit`.
   - Botones: `PrimaryButton` / `SecondaryButton` / `InverseButton` (blanco sobre brand) / `GhostButton` (ghost, color por prop) / `OutlineButton` (outline sutil) — **ya traen `size` (default `lg` en primary/secondary/inverse), `radius` y colores; no volver a personalizarlos**. Solo `children` + props semánticas (`asChild`, `type`, `disabled`, `loading`, `width`, `onClick`, `size`/`color` si hace falta).
