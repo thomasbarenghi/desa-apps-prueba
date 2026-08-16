@@ -3,7 +3,7 @@ import Person from "@gravity-ui/icons/Person"
 import { NavLink } from "react-router-dom"
 import { routes } from "../../routes"
 import { CartButton } from "../CartButton"
-import { ColorModeButton } from "../ColorModeProvider/ColorModeButton"
+import { ColorModeButton } from "@repo/components"
 import { LocationButton } from "../LocationButton"
 
 interface HeaderActionsProps {

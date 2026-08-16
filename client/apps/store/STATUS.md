@@ -4,7 +4,7 @@
 > **Actualizado:** agosto 2026.
 > **Alcance:** estado completo de la app de tienda (store), cómo está armada, qué es mock vs. real, y el mapa para conectar la API real y desarrollar la app de administración.
 >
-> Fuentes de verdad del proyecto: `plan/api/base.md` (espec funcional), `plan/api/avance.md` (avance backend), `plan/client/ui-manifesto.md` y `plan/client/design-system.md` (identidad visual), `plan/division-de-tareas.md` (reparto de trabajo).
+> Fuentes de verdad del proyecto: `plan/api/base.md` (espec funcional), `plan/api/avance.md` (avance backend), `client/docs/ui-manifesto.md` (identidad visual + sistema), `plan/client/especificacion_frontends_tienda_admin_solo_base.md` (espec funcional frontend), `plan/division-de-tareas.md` (reparto de trabajo).
 
 ---
 

@@ -1,52 +1,23 @@
-import { Box, HStack } from "@chakra-ui/react"
-import { useLocation } from "react-router-dom"
+import { MobileNav } from "@repo/components"
+import type { MobileNavItem } from "@repo/components"
+import House from "@gravity-ui/icons/House"
+import LayoutCells from "@gravity-ui/icons/LayoutCells"
+import ListUl from "@gravity-ui/icons/ListUl"
+import Person from "@gravity-ui/icons/Person"
+import ShoppingCart from "@gravity-ui/icons/ShoppingCart"
 import { routes } from "../../routes"
 import { useCartCount } from "../CartButton/hooks/useCartCount"
-import { MobileNavItem } from "./MobileNavItem"
-import { mobileNavItems } from "./utils/navigation"
 
 export const MobileStoreNavigation = () => {
-  const { pathname } = useLocation()
   const { count } = useCartCount()
 
-  const isActive = (path: string) => {
-    if (path === routes.home) return pathname === routes.home
-    return pathname.startsWith(path)
-  }
+  const items: MobileNavItem[] = [
+    { id: "home", label: "Inicio", path: routes.home, icon: House, exact: true },
+    { id: "catalog", label: "Catálogo", path: routes.catalog, icon: LayoutCells },
+    { id: "cart", label: "Carrito", path: routes.cart, icon: ShoppingCart, badge: count },
+    { id: "orders", label: "Pedidos", path: routes.orders, icon: ListUl },
+    { id: "profile", label: "Perfil", path: routes.profile, icon: Person },
+  ]
 
-  return (
-    <Box
-      position="fixed"
-      bottom="4"
-      left="0"
-      right="0"
-      display={{ base: "flex", md: "none" }}
-      justifyContent="center"
-      paddingX="4"
-      zIndex="docked"
-      pointerEvents="none"
-    >
-      <HStack
-        as="nav"
-        gap="0"
-        bg="bg.panel"
-        borderRadius="full"
-        padding="1"
-        border="1px solid"
-        borderColor="border.subtle"
-        boxShadow="lg"
-        pointerEvents="auto"
-        aria-label="Navegación principal"
-      >
-        {mobileNavItems.map((item) => (
-          <MobileNavItem
-            key={item.id}
-            item={item}
-            isActive={isActive(item.path)}
-            count={item.id === "cart" ? count : undefined}
-          />
-        ))}
-      </HStack>
-    </Box>
-  )
+  return <MobileNav items={items} />
 }

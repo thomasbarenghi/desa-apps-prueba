@@ -2,7 +2,7 @@ import { useState } from "react"
 import type { FormEvent } from "react"
 import { useNavigate } from "react-router-dom"
 import { routes } from "../../../routes"
-import { useAuthStore } from "../../../stores/authStore"
+import { useAuthStore } from "@repo/api"
 
 export const useRegister = () => {
   const register = useAuthStore((state) => state.register)

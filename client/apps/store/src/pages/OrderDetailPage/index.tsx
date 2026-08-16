@@ -1,28 +1,27 @@
+import { Box, HStack, Image, Spinner, Text, VStack, useMediaQuery } from '@chakra-ui/react'
+import CircleCheckFill from '@gravity-ui/icons/CircleCheckFill'
+import CircleXmarkFill from '@gravity-ui/icons/CircleXmarkFill'
+import { Link, useParams } from 'react-router-dom'
 import {
-  Box,
-  Button,
-  Heading,
-  HStack,
-  Image,
-  Spinner,
-  Text,
-  VStack,
-  useMediaQuery,
-} from "@chakra-ui/react"
-import CircleCheckFill from "@gravity-ui/icons/CircleCheckFill"
-import CircleXmarkFill from "@gravity-ui/icons/CircleXmarkFill"
-import { Link, useParams } from "react-router-dom"
-import { BackButton } from "../../components/BackButton"
-import { EmptyState } from "../../components/EmptyState"
-import { OrderStatusBadge } from "../../components/OrderStatusBadge"
-import { OrderTimeline } from "../../components/OrderTimeline"
-import { useOrder } from "../../hooks/useOrder"
-import { routes } from "../../routes"
-import type { Order } from "../../types/order"
-import { formatPrice } from "../../utils/catalog"
-import { buildStaticMapUrl } from "../../utils/geoapify"
-import { formatOrderDate, isActiveOrder } from "../../utils/orders"
-import { useRiderPosition } from "./hooks/useRiderPosition"
+  BackButton,
+  Muted,
+  PageContainer,
+  PageTitle,
+  Price,
+  PrimaryButton,
+  Strong,
+  Subtle,
+} from '@repo/components'
+import { EmptyState } from '@repo/components'
+import { OrderStatusBadge } from '@repo/components'
+import { OrderTimeline } from '@repo/components'
+import { useOrder } from '@repo/api'
+import { routes } from '../../routes'
+import type { Order } from '@repo/domain'
+import { formatPrice } from '@repo/domain'
+import { buildStaticMapUrl } from '../../utils/geoapify'
+import { formatOrderDate, isActiveOrder } from '@repo/domain'
+import { useRiderPosition } from './hooks/useRiderPosition'
 
 export const OrderDetailPage = () => {
   const { orderId } = useParams()
@@ -42,9 +41,9 @@ export const OrderDetailPage = () => {
         title="Pedido no encontrado"
         description="No pudimos encontrar este pedido. Probá desde la lista de pedidos."
         action={
-          <Button asChild bg="brand.600" color="white" borderRadius="full" _hover={{ bg: "brand.700" }}>
+          <PrimaryButton asChild>
             <Link to={routes.orders}>Volver a mis pedidos</Link>
-          </Button>
+          </PrimaryButton>
         }
       />
     )
@@ -53,95 +52,115 @@ export const OrderDetailPage = () => {
   const active = isActiveOrder(order.status)
 
   return (
-    <VStack align="stretch" gap="6" maxW="3xl">
+    <PageContainer>
       <BackButton />
 
       <VStack align="start" gap="1">
         <HStack gap="3" flexWrap="wrap">
-          <Heading as="h1" fontSize={{ base: "3xl", md: "4xl" }} fontWeight="bold">
-            Pedido #{order.number}
-          </Heading>
+          <PageTitle>Pedido #{order.number}</PageTitle>
           <OrderStatusBadge status={order.status} />
         </HStack>
-        <Text color="fg.muted">Realizado el {formatOrderDate(order.createdAt)}</Text>
+        <Muted>Realizado el {formatOrderDate(order.createdAt)}</Muted>
       </VStack>
 
       {active ? (
         <>
-          <Box bg="bg.subtle" border="1px solid" borderColor="border.subtle" borderRadius="2xl" padding="5">
-            <Text fontWeight="semibold" marginBottom="4">
-              Estado del pedido
-            </Text>
+          <Box
+            bg="bg.subtle"
+            border="1px solid"
+            borderColor="border.subtle"
+            borderRadius="2xl"
+            padding="5"
+          >
+            <Strong marginBottom="4">Estado del pedido</Strong>
             <OrderTimeline status={order.status} />
-            <Text color="fg.muted" fontSize="sm" marginTop="4">
-              {order.branch} · {order.eta ?? "Estimando tiempo"}
-            </Text>
+            <Muted fontSize="sm" marginTop="4">
+              {order.branch} · {order.eta ?? 'Estimando tiempo'}
+            </Muted>
           </Box>
           <TrackingMap order={order} />
         </>
       ) : null}
 
-      {order.status === "CANCELLED" ? (
-        <Box bg="bg.panel" border="1px solid" borderColor="border.subtle" borderRadius="2xl" padding="5">
+      {order.status === 'CANCELLED' ? (
+        <Box
+          bg="bg.panel"
+          border="1px solid"
+          borderColor="border.subtle"
+          borderRadius="2xl"
+          padding="5"
+        >
           <Box color="danger" display="flex" marginBottom="2">
             <CircleXmarkFill width={28} height={28} />
           </Box>
-          <Text fontWeight="semibold" fontSize="lg">
-            Pedido cancelado
-          </Text>
-          <Text color="fg.muted" fontSize="sm" marginTop="1">
+          <Strong fontSize="lg">Pedido cancelado</Strong>
+          <Muted fontSize="sm" marginTop="1">
             {order.cancelReason}
-          </Text>
+          </Muted>
         </Box>
       ) : null}
 
-      {order.status === "DELIVERED" ? (
-        <Box bg="bg.panel" border="1px solid" borderColor="border.subtle" borderRadius="2xl" padding="5">
+      {order.status === 'DELIVERED' ? (
+        <Box
+          bg="bg.panel"
+          border="1px solid"
+          borderColor="border.subtle"
+          borderRadius="2xl"
+          padding="5"
+        >
           <Box color="success" display="flex" marginBottom="2">
             <CircleCheckFill width={28} height={28} />
           </Box>
-          <Text fontWeight="semibold" fontSize="lg">
-            Entregado
-          </Text>
-          <Text color="fg.muted" fontSize="sm" marginTop="1">
-            Recibido el {order.deliveredAt ? formatOrderDate(order.deliveredAt) : "—"}
-          </Text>
+          <Strong fontSize="lg">Entregado</Strong>
+          <Muted fontSize="sm" marginTop="1">
+            Recibido el {order.deliveredAt ? formatOrderDate(order.deliveredAt) : '—'}
+          </Muted>
         </Box>
       ) : null}
 
-      <Box bg="bg.panel" border="1px solid" borderColor="border.subtle" borderRadius="2xl" padding="5">
-        <Text color="fg.muted" fontSize="sm" marginBottom="3">
+      <Box
+        bg="bg.panel"
+        border="1px solid"
+        borderColor="border.subtle"
+        borderRadius="2xl"
+        padding="5"
+      >
+        <Muted fontSize="sm" marginBottom="3">
           Productos
-        </Text>
+        </Muted>
         <VStack gap="3" align="stretch">
           {order.items.map((item) => (
             <HStack key={item.id} justify="space-between">
               <Text>
                 {item.quantity} × {item.name}
               </Text>
-              <Text fontWeight="medium" fontVariantNumeric="tabular-nums">
-                {formatPrice(item.unitPrice * item.quantity)}
-              </Text>
+              <Price fontWeight="medium">{formatPrice(item.unitPrice * item.quantity)}</Price>
             </HStack>
           ))}
         </VStack>
       </Box>
 
-      <Box bg="bg.subtle" border="1px solid" borderColor="border.subtle" borderRadius="2xl" padding="5">
+      <Box
+        bg="bg.subtle"
+        border="1px solid"
+        borderColor="border.subtle"
+        borderRadius="2xl"
+        padding="5"
+      >
         <HStack justify="space-between" marginBottom="2">
-          <Text fontWeight="semibold">Total</Text>
-          <Text fontWeight="bold" fontSize="xl" fontVariantNumeric="tabular-nums">
+          <Strong>Total</Strong>
+          <Price fontWeight="bold" fontSize="xl">
             {formatPrice(order.total)}
-          </Text>
+          </Price>
         </HStack>
-        <Text color="fg.subtle" fontSize="sm">Entrega a {order.deliveryAddress}</Text>
+        <Subtle fontSize="sm">Entrega a {order.deliveryAddress}</Subtle>
       </Box>
-    </VStack>
+    </PageContainer>
   )
 }
 
 const TrackingMap = ({ order }: { order: Order }) => {
-  const [isDesktop] = useMediaQuery(["(min-width: 48em)"], { ssr: false })
+  const [isDesktop] = useMediaQuery(['(min-width: 48em)'], { ssr: false })
   const riderPosition = useRiderPosition(
     { lat: order.store.lat, lon: order.store.lon },
     { lat: order.client.lat, lon: order.client.lon },
@@ -158,15 +177,15 @@ const TrackingMap = ({ order }: { order: Order }) => {
     width: isDesktop ? 1200 : 600,
     height: isDesktop ? 340 : 700,
     markers: [
-      { lat: order.store.lat, lon: order.store.lon, color: "#1d4ed8", label: "T" },
-      { lat: order.client.lat, lon: order.client.lon, color: "#15803d", label: "C" },
+      { lat: order.store.lat, lon: order.store.lon, color: '#1d4ed8', label: 'T' },
+      { lat: order.client.lat, lon: order.client.lon, color: '#15803d', label: 'C' },
       ...(order.rider
         ? [
             {
               lat: riderPosition.lat,
               lon: riderPosition.lon,
-              color: "#ea580c",
-              icon: "person-biking",
+              color: '#ea580c',
+              icon: 'person-biking',
             },
           ]
         : []),
@@ -174,12 +193,12 @@ const TrackingMap = ({ order }: { order: Order }) => {
   })
 
   const legend = [
-    { color: "info", title: "Tienda", subtitle: order.store.address },
-    { color: "success", title: "Tu dirección", subtitle: order.client.address },
+    { color: 'info', title: 'Tienda', subtitle: order.store.address },
+    { color: 'success', title: 'Tu dirección', subtitle: order.client.address },
     ...(order.rider
       ? [
           {
-            color: "brand.500",
+            color: 'brand.500',
             title: `Rider · ${order.rider.name}`,
             subtitle: order.rider.vehicle,
           },
@@ -188,16 +207,20 @@ const TrackingMap = ({ order }: { order: Order }) => {
   ]
 
   return (
-    <Box bg="bg.panel" border="1px solid" borderColor="border.subtle" borderRadius="2xl" overflow="hidden">
+    <Box
+      bg="bg.panel"
+      border="1px solid"
+      borderColor="border.subtle"
+      borderRadius="2xl"
+      overflow="hidden"
+    >
       <Box padding="4" paddingBottom="3">
         <HStack justify="space-between">
-          <Text fontWeight="semibold">Seguimiento en vivo</Text>
+          <Strong>Seguimiento en vivo</Strong>
           {order.rider ? (
             <HStack gap="1.5" color="success" alignItems="center">
               <Box width="8px" height="8px" borderRadius="full" bg="currentColor" />
-              <Text fontSize="xs" fontWeight="semibold">
-                En vivo
-              </Text>
+              <Strong fontSize="xs">En vivo</Strong>
             </HStack>
           ) : null}
         </HStack>
@@ -222,19 +245,15 @@ const TrackingMap = ({ order }: { order: Order }) => {
                 marginTop="1.5"
               />
               <Box>
-                <Text fontSize="sm" fontWeight="semibold">
-                  {item.title}
-                </Text>
-                <Text fontSize="sm" color="fg.muted">
-                  {item.subtitle}
-                </Text>
+                <Strong fontSize="sm">{item.title}</Strong>
+                <Muted fontSize="sm">{item.subtitle}</Muted>
               </Box>
             </HStack>
           ))}
         </VStack>
-        <Text fontSize="2xs" color="fg.subtle" marginTop="3">
+        <Subtle fontSize="2xs" marginTop="3">
           © OpenStreetMap · Geoapify
-        </Text>
+        </Subtle>
       </Box>
     </Box>
   )

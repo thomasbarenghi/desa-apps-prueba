@@ -17,7 +17,7 @@ Proyecto **DESA Apps**: plataforma de pedidos para una cadena de comidas rápida
 2. Respetar la especificación de `plan/api/base.md` y el avance de `plan/api/avance.md`.
 3. No crear archivos dentro de `agent-local/` que deban compartirse: esa carpeta **no se pushea**.
 4. Los archivos que se pushean van en `api/`, `client/` o `plan/`, nunca en `agent-local/`.
-5. **UI:** para cualquier trabajo visual en frontend, leer el UI Manifesto en `plan/client/ui-manifesto.md` (dirección "Calor", paleta, tipografía, patrones).
+5. **UI:** para cualquier trabajo visual en frontend, leer el UI Manifesto en `client/docs/ui-manifesto.md` (dirección "Calor", paleta, tipografía, patrones).
 
 ## Calidad
 

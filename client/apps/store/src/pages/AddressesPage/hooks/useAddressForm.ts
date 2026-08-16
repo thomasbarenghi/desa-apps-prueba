@@ -1,6 +1,6 @@
 import { useState } from "react"
 import { useAddressStore } from "../../../stores/addressStore"
-import type { Address, AddressInput } from "../../../types/address"
+import type { Address, AddressInput } from "@repo/domain"
 
 const EMPTY_FORM: AddressInput = { label: "", street: "", city: "", reference: "" }
 

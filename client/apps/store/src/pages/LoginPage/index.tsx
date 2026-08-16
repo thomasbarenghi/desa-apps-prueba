@@ -1,6 +1,5 @@
-import { Button, Field, Heading, HStack, Input, Link as ChakraLink, Text, VStack } from "@chakra-ui/react"
-import { Link } from "react-router-dom"
-import { PasswordInput } from "../../components/PasswordInput"
+import { HStack, Text, VStack } from "@chakra-ui/react"
+import { PageHeader, PasswordField, PrimaryButton, TextField, TextLink } from "@repo/components"
 import { routes } from "../../routes"
 import { useLogin } from "./hooks/useLogin"
 
@@ -9,69 +8,41 @@ export const LoginPage = () => {
 
   return (
     <VStack gap="8" align="stretch">
-      <VStack align="start" gap="2">
-        <Heading as="h1" fontSize={{ base: "4xl", md: "2xl" }} fontWeight="bold">
-          Ingresá a tu cuenta
-        </Heading>
-        <Text color="fg.muted">Pedí desde tu campus favorito.</Text>
-      </VStack>
+      <PageHeader title="Ingresá a tu cuenta" description="Pedí desde tu campus favorito." />
 
       <form onSubmit={onSubmit}>
         <VStack gap="4" align="stretch">
-          <Field.Root required>
-            <Field.Label>Email</Field.Label>
-            <Input
-              type="email"
-              autoComplete="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="juan.perez@unahur.edu.ar"
-              size="lg"
-              borderRadius="xl"
-              bg="bg"
-            />
-          </Field.Root>
-          <Field.Root required>
-            <Field.Label>Contraseña</Field.Label>
-            <PasswordInput
-              autoComplete="current-password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder="Mínimo 6 caracteres"
-              size="lg"
-              borderRadius="xl"
-              bg="bg"
-            />
-          </Field.Root>
+          <TextField
+            label="Email"
+            required
+            type="email"
+            autoComplete="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            placeholder="juan.perez@unahur.edu.ar"
+          />
+          <PasswordField
+            label="Contraseña"
+            required
+            autoComplete="current-password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            placeholder="Mínimo 6 caracteres"
+          />
           {error ? (
             <Text color="danger" fontSize="sm">
               {error}
             </Text>
           ) : null}
-          <Button
-            type="submit"
-            size="lg"
-            height="12"
-            borderRadius="full"
-            bg="brand.600"
-            color="white"
-            _hover={{ bg: "brand.700" }}
-            disabled={!isValid || submitting}
-            loading={submitting}
-            marginTop="2"
-          >
+          <PrimaryButton type="submit" disabled={!isValid || submitting} loading={submitting} marginTop="2">
             Ingresar
-          </Button>
+          </PrimaryButton>
         </VStack>
       </form>
 
       <HStack justify="space-between" fontSize="sm" flexWrap="wrap" gap="2">
-        <ChakraLink asChild color="brand.600" fontWeight="medium">
-          <Link to={routes.forgotPassword}>Olvidé mi contraseña</Link>
-        </ChakraLink>
-        <ChakraLink asChild color="brand.600" fontWeight="medium">
-          <Link to={routes.register}>Crear cuenta</Link>
-        </ChakraLink>
+        <TextLink to={routes.forgotPassword}>Olvidé mi contraseña</TextLink>
+        <TextLink to={routes.register}>Crear cuenta</TextLink>
       </HStack>
     </VStack>
   )

@@ -1,6 +1,7 @@
-import { Box, Button, Text } from "@chakra-ui/react"
+import { Box, Text } from "@chakra-ui/react"
 import ChevronDown from "@gravity-ui/icons/ChevronDown"
 import GeoPin from "@gravity-ui/icons/GeoPin"
+import { GhostButton } from "@repo/components"
 import { selectedAddress, useAddressStore } from "../../stores/addressStore"
 import type { LocationButtonProps } from "./types"
 
@@ -9,15 +10,11 @@ export const LocationButton = ({ onOpen }: LocationButtonProps) => {
   const label = selected ? selected.street : "Elegí tu dirección"
 
   return (
-    <Button
-      variant="ghost"
+    <GhostButton
       size="sm"
       height="9"
       gap="1.5"
       paddingX="3"
-      borderRadius="full"
-      color="fg"
-      _hover={{ bg: "bg.muted" }}
       onClick={onOpen}
       aria-label={`Dirección de entrega: ${label}`}
     >
@@ -35,6 +32,6 @@ export const LocationButton = ({ onOpen }: LocationButtonProps) => {
       <Box color="fg.subtle" display="flex">
         <ChevronDown width={14} height={14} />
       </Box>
-    </Button>
+    </GhostButton>
   )
 }

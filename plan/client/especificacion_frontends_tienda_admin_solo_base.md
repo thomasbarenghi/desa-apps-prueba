@@ -9,6 +9,8 @@
 
 > Este documento define cómo diseñar las interfaces de la **Tienda** y del **Sistema Administrativo**. No agrega funcionalidades de las extensiones 1 o 2 ni componentes funcionales ajenos a la consigna.
 
+> **Nota de alcance:** este documento es la fuente de verdad **funcional** (roles, página por página, responsive, integración). La fuente de verdad **visual y de sistema** (paleta "Calor", tokens, layouts) es `client/docs/ui-manifesto.md`. Ante cualquier conflicto visual, gana el manifesto.
+
 ---
 
 ## Índice

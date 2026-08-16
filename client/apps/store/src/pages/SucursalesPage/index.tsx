@@ -1,19 +1,17 @@
-import { Badge, Box, Heading, HStack, Text, VStack } from "@chakra-ui/react"
-import Clock from "@gravity-ui/icons/Clock"
-import GeoPin from "@gravity-ui/icons/GeoPin"
-import Handset from "@gravity-ui/icons/Handset"
-import { BackButton } from "../../components/BackButton"
-import { MOCK_BRANCHES } from "../../utils/sucursales"
+import { Badge, Box, HStack, Text, VStack } from '@chakra-ui/react'
+import Clock from '@gravity-ui/icons/Clock'
+import GeoPin from '@gravity-ui/icons/GeoPin'
+import Handset from '@gravity-ui/icons/Handset'
+import { BackButton, Muted, PageContainer, PageTitle, Strong, Subtle } from '@repo/components'
+import { MOCK_BRANCHES } from '../../utils/sucursales'
 
 export const SucursalesPage = () => {
   return (
-    <VStack align="stretch" gap="6" maxW="3xl">
+    <PageContainer>
       <BackButton />
       <VStack align="start" gap="1">
-        <Heading as="h1" fontSize={{ base: "3xl", md: "4xl" }} fontWeight="bold">
-          Sucursales
-        </Heading>
-        <Text color="fg.muted">Los locales que pueden atender tu zona.</Text>
+        <PageTitle>Sucursales</PageTitle>
+        <Muted>Los locales que pueden atender tu zona.</Muted>
       </VStack>
 
       <VStack gap="3" align="stretch">
@@ -27,17 +25,15 @@ export const SucursalesPage = () => {
             padding="5"
           >
             <HStack justify="space-between" marginBottom="3">
-              <Text fontWeight="semibold" fontSize="lg">
-                {branch.name}
-              </Text>
+              <Strong fontSize="lg">{branch.name}</Strong>
               <Badge
-                colorPalette={branch.open ? "green" : "red"}
+                colorPalette={branch.open ? 'green' : 'red'}
                 variant="subtle"
                 borderRadius="full"
                 paddingX="2.5"
                 paddingY="1"
               >
-                {branch.open ? "Abierta" : "Cerrada"}
+                {branch.open ? 'Abierta' : 'Cerrada'}
               </Badge>
             </HStack>
             <VStack gap="2" align="stretch" color="fg.muted" fontSize="sm">
@@ -58,12 +54,12 @@ export const SucursalesPage = () => {
                   <Clock width={16} height={16} />
                 </Box>
                 <Text>Hoy: {branch.hours}</Text>
-                <Text color="fg.subtle">· {branch.distanceKm.toLocaleString("es-AR")} km</Text>
+                <Subtle>· {branch.distanceKm.toLocaleString('es-AR')} km</Subtle>
               </HStack>
             </VStack>
           </Box>
         ))}
       </VStack>
-    </VStack>
+    </PageContainer>
   )
 }

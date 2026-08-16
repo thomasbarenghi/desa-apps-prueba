@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react"
-import { useProduct } from "../../../hooks/useProduct"
+import { useProduct } from "@repo/api"
 import { useCartStore } from "../../../stores/cartStore"
-import type { ProductOptionType } from "../../../types/catalog"
+import type { ProductOptionType } from "@repo/domain"
 
 type SelectionMap = Record<number, number | number[]>
 

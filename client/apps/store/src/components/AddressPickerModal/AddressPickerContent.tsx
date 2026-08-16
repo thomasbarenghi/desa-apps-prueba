@@ -1,7 +1,8 @@
-import { Box, Button, Heading, Text, VStack } from "@chakra-ui/react"
+import { Box, Button, Heading, VStack } from "@chakra-ui/react"
 import ChevronRight from "@gravity-ui/icons/ChevronRight"
 import GeoPin from "@gravity-ui/icons/GeoPin"
 import Plus from "@gravity-ui/icons/Plus"
+import { GhostButton, Muted, Strong, Subtle } from "@repo/components"
 import { AddressForm } from "./AddressForm"
 import type { UseAddressPickerReturn } from "./hooks/useAddressPicker"
 
@@ -41,11 +42,11 @@ export const AddressPickerContent = (props: AddressPickerContentProps) => {
         <Heading as="h2" fontSize="xl" fontWeight="bold">
           {showForm ? "Cargá tu dirección" : "¿A dónde te lo llevamos?"}
         </Heading>
-        <Text color="fg.muted" fontSize="sm">
+        <Muted fontSize="sm">
           {showForm
             ? "Contanos dónde estás para llevarte el pedido."
             : "Elegí una de tus direcciones guardadas."}
-        </Text>
+        </Muted>
       </VStack>
 
       {showForm ? (
@@ -75,13 +76,11 @@ export const AddressPickerContent = (props: AddressPickerContentProps) => {
               onClick={() => handleSelect(address.id)}
             >
               <Box flex="1" minWidth="0">
-                <Text fontWeight="semibold">{address.label}</Text>
-                <Text color="fg.muted" fontSize="sm" lineClamp={1}>
+                <Strong>{address.label}</Strong>
+                <Muted fontSize="sm" lineClamp={1}>
                   {address.street}
-                </Text>
-                <Text color="fg.subtle" fontSize="xs">
-                  {address.city}
-                </Text>
+                </Muted>
+                <Subtle fontSize="xs">{address.city}</Subtle>
               </Box>
               <Box color="fg.subtle" display="flex">
                 <ChevronRight width={18} height={18} />
@@ -89,18 +88,16 @@ export const AddressPickerContent = (props: AddressPickerContentProps) => {
             </Button>
           ))}
 
-          <Button
-            variant="ghost"
+          <GhostButton
             width="full"
             borderRadius="xl"
             paddingY="3.5"
             color="brand.600"
-            _hover={{ bg: "bg.muted" }}
             onClick={openForm}
           >
             <Plus width={16} height={16} />
             Agregar nueva dirección
-          </Button>
+          </GhostButton>
         </VStack>
       )}
     </Box>
