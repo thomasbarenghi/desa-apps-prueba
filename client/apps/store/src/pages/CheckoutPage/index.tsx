@@ -2,16 +2,19 @@ import { Box, Button, Field, Heading, HStack, Input, Text, VStack } from "@chakr
 import CircleCheckFill from "@gravity-ui/icons/CircleCheckFill"
 import { useState } from "react"
 import { Link } from "react-router-dom"
+import { BackButton } from "../../components/BackButton"
 import { EmptyState } from "../../components/EmptyState"
 import { cartTotal, lineTotal, useCartStore } from "../../stores/cartStore"
+import { selectedAddress, useAddressStore } from "../../stores/addressStore"
 import { formatPrice } from "../../utils/catalog"
 
 export const CheckoutPage = () => {
   const lines = useCartStore((state) => state.lines)
   const clear = useCartStore((state) => state.clear)
+  const selected = useAddressStore(selectedAddress)
   const [confirmed, setConfirmed] = useState(false)
-  const [address, setAddress] = useState("")
-  const [city, setCity] = useState("")
+  const [address, setAddress] = useState(selected?.street ?? "")
+  const [city, setCity] = useState(selected?.city ?? "")
   const total = cartTotal(lines)
 
   const addressComplete = address.trim() !== "" && city.trim() !== ""
@@ -60,6 +63,7 @@ export const CheckoutPage = () => {
 
   return (
     <VStack align="stretch" gap="6" maxW="2xl" marginX="auto">
+      <BackButton />
       <VStack align="start" gap="1">
         <Heading as="h1" fontSize={{ base: "3xl", md: "4xl" }} fontWeight="bold">
           Confirmar pedido

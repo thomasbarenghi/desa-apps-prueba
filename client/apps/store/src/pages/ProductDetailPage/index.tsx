@@ -5,15 +5,14 @@ import {
   HStack,
   Heading,
   Image,
-  Link as ChakraLink,
   Skeleton,
   Text,
   Textarea,
   VStack,
 } from "@chakra-ui/react"
-import ChevronLeft from "@gravity-ui/icons/ChevronLeft"
 import Check from "@gravity-ui/icons/Check"
 import { Link, useNavigate, useParams } from "react-router-dom"
+import { BackButton } from "../../components/BackButton"
 import { EmptyState } from "../../components/EmptyState"
 import { QuantityStepper } from "../../components/QuantityStepper"
 import { formatPrice, getCategoryName } from "../../utils/catalog"
@@ -57,16 +56,7 @@ export const ProductDetailPage = () => {
 
   return (
     <VStack align="stretch" gap="6">
-      <Box>
-        <ChakraLink asChild color="fg.muted" fontWeight="medium" fontSize="sm" _hover={{ color: "fg" }}>
-          <Link to="/catalogo">
-            <HStack gap="1">
-              <ChevronLeft width={16} height={16} />
-              <Text>Volver al catálogo</Text>
-            </HStack>
-          </Link>
-        </ChakraLink>
-      </Box>
+      <BackButton />
 
       <Grid templateColumns={{ base: "1fr", md: "1fr 1fr" }} gap={{ base: "6", md: "10" }} alignItems="start">
         <Box position={{ md: "sticky" }} top="24">

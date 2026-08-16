@@ -60,8 +60,9 @@ Antes de finalizar: **"¿Si nunca hubiera visto la interfaz anterior, la diseña
 ## 2. Verdades de producto (no inventar)
 
 - **La entrega es a la dirección del cliente**, que se **carga en el flujo de checkout**. No existe "entrega al campus" ni una dirección por defecto.
+- Al cargar la app, si no hay una dirección seleccionada, se pide elegir la **dirección actual** (modal en desktop, bottom sheet en mobile): se ofrecen las direcciones guardadas y, si no hay, se invita a cargar una. La elección persiste y precarga el checkout.
 - La **sucursal se asigna automáticamente** al confirmar (la más cercana, activa y abierta). No es una decisión del cliente.
-- No hay pago en línea, mapa, ni descuentos automáticos.
+- No hay pago en línea ni descuentos automáticos. El mapa (estático, Geoapify) se usa solo para el seguimiento de un pedido activo.
 - El carrito y el total son datos del servidor; el frontend no los calcula como verdad final.
 - El estado de pedido tiene su propia máquina de estados y traducción (ver §5.6).
 
@@ -134,7 +135,8 @@ Definida en `apps/*/src/theme.ts` como tokens semánticos de Chakra.
 
 - Sticky, `bg.panel`, borde inferior `border.subtle`.
 - **Desktop:** logo + nav con píldora activa naranja + acciones (toggle dark, carrito, perfil).
-- **Mobile: solo el logo.** Sin botones en el header. El carrito vive en el dock; el toggle dark vive en la página Perfil.
+- **Mobile: logo + selector de dirección.** El selector (`LocationButton`) aparece solo en Inicio y Catálogo; el resto de acciones (carrito, dark) viven en el dock y en Perfil.
+- **Pantallas empujadas (fuera del dock):** el header con logo se reemplaza por una **flecha de volver** (`BackButton`, `ArrowLeft` + `navigate(-1)`) tipo iOS. Aplica a: detalle de producto (`/productos/:id`), checkout, sucursales, detalle de pedido (`/pedidos/:id`), editar perfil y mis direcciones. Las pantallas del dock (Inicio, Catálogo, Carrito, Pedidos, Perfil) conservan el header con logo.
 
 ### 5.4 Navegación mobile (`MobileStoreNavigation`)
 
