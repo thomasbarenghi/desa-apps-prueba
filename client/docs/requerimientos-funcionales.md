@@ -1,15 +1,17 @@
-# Especificación UX/UI de los Frontends — Tienda y Administración
+# Especificación Funcional — Auth, Tienda y Administración
 
 **Proyecto:** Plataforma de pedidos para una cadena de comidas rápidas  
 **Materia:** Desarrollo de Aplicaciones — UNaHur  
 **Equipo:** Thomas (SSR), Mateo (Trainee), Bosco (Trainee)  
-**Documento:** propuesta funcional y visual para los dos frontends  
-**Alcance:** únicamente las funcionalidades base de la consigna  
-**Versión:** 1.0
+**Documento:** requerimientos funcionales de los frontends  
+**Alcance:** funcionalidades base de la consigna  
+**Versión:** 1.1
 
-> Este documento define cómo diseñar las interfaces de la **Tienda** y del **Sistema Administrativo**. No agrega funcionalidades de las extensiones 1 o 2 ni componentes funcionales ajenos a la consigna.
+> Este documento define el **alcance funcional** de los tres frontends: **Auth** (login/registro/recuperación), **Tienda** (clientes) y **Administración** (admin). No agrega las extensiones 1 o 2.
 
-> **Nota de alcance:** este documento es la fuente de verdad **funcional** (roles, página por página, responsive, integración). La fuente de verdad **visual y de sistema** (paleta "Calor", tokens, layouts) es `client/docs/ui-manifesto.md`. Ante cualquier conflicto visual, gana el manifesto.
+> **Fuentes de verdad:** este documento es la fuente de verdad **funcional**. La fuente de verdad **visual y de sistema** (dirección "Calor", paleta, tokens, layouts) es `client/docs/ui-manifesto.md`; ante cualquier conflicto visual gana el manifesto. La arquitectura implementada (monorepo, apps, paquetes) está en §12 y en `client/CLAUDE.md`.
+
+> **Nota de implementación:** la autenticación vive en su propia app (`apps/auth`), que tras el login redirige a Tienda o Administración según el `role` que devuelve el auth API. Las pantallas T-01 a T-04 corresponden a esa app.
 
 ---
 
@@ -104,28 +106,19 @@ flowchart LR
 
 ## 2.1 Separación de aplicaciones
 
-Se recomienda mantener dos aplicaciones diferenciadas, con componentes compartidos cuando corresponda.
+Tres aplicaciones independientes (monorepo Turborepo) con paquetes compartidos:
 
 ```text
-frontend/
-├── shared/
-│   ├── api/
-│   ├── auth/
-│   ├── components/
-│   ├── design-system/
-│   ├── hooks/
-│   ├── validation/
-│   └── types/
-├── store/
-│   ├── app/
-│   ├── pages/
-│   ├── features/
-│   └── routes/
-└── admin/
-    ├── app/
-    ├── pages/
-    ├── features/
-    └── routes/
+client/
+├── apps/
+│   ├── auth/     # login, registro, recuperación; redirige por rol
+│   ├── store/    # catálogo, carrito, checkout, pedidos, perfil
+│   └── admin/    # sistema administrativo
+└── packages/
+    ├── components/  # UI genérica + tokens (@repo/components)
+    ├── domain/      # tipos, constantes y schemas de validación (@repo/domain)
+    ├── api/         # hooks de datos + mocks + sesión (@repo/api)
+    └── theme/       # tokens de Chakra (@repo/theme)
 ```
 
 ## 2.2 Responsabilidades del frontend
@@ -185,15 +178,17 @@ El carrito debe considerarse un dato del servidor. La interfaz puede mantener un
 
 ## 3.1 Guards de rutas
 
-- **GuestRoute:** login, registro y recuperación.
-- **CustomerRoute:** carrito, checkout, pedidos, perfil y direcciones.
-- **AdminRoute:** todo el sistema administrativo.
+- **Auth app:** rutas públicas (login, registro, recuperación). Tras loguear, redirige a Tienda o Administración según el `role` del auth API.
+- **CustomerRoute (`RequireAuth`):** protege carrito, checkout, pedidos, perfil y direcciones de la Tienda; redirige al login de la app de auth (`VITE_AUTH_URL`).
+- **AdminRoute (`RequireAuth roles=["admin"]`):** todo el sistema administrativo; solo usuarios con rol `admin`.
 - Un cliente no debe poder entrar a rutas administrativas.
 - Un administrador no debe operar la tienda como cliente con la misma sesión, salvo que el backend defina explícitamente ambos roles.
 
 ---
 
 # 4. Sistema de diseño compartido
+
+> **Visual ya definido:** la dirección "Calor", paleta, tipografía, geometría, patrones y tokens viven en `client/docs/ui-manifesto.md`; la implementación está en `@repo/theme` + `@repo/components`. Esta sección queda como propuesta histórica.
 
 ## 4.1 Dirección visual
 
@@ -2446,6 +2441,8 @@ Cada operación debe definir:
 ---
 
 # 12. Organización sugerida del código
+
+> **Implementado:** monorepo Turborepo en `client/` — `apps/{auth,store,admin}` + `packages/{components,domain,api,theme,eslint-config,typescript-config}`. La estructura sugerida abajo (`features/`) es una referencia conceptual; la real usa `src/components`, `src/pages`, `src/hooks`, `src/stores`, `src/layouts`, etc. dentro de cada app. Ver `client/CLAUDE.md` y `client/AGENTS.md`.
 
 ## 12.1 Tienda
 
