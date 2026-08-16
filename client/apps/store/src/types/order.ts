@@ -7,6 +7,25 @@ export type OrderStatus =
   | "DELIVERED"
   | "CANCELLED"
 
+export interface OrderItem {
+  id: string
+  name: string
+  quantity: number
+  unitPrice: number
+}
+
+export interface OrderLocation {
+  label: string
+  address: string
+  lat: number
+  lon: number
+}
+
+export interface OrderRider {
+  name: string
+  vehicle: string
+}
+
 export interface Order {
   id: string
   number: number
@@ -16,4 +35,11 @@ export interface Order {
   itemCount: number
   branch: string
   eta?: string
+  items: OrderItem[]
+  deliveryAddress: string
+  store: OrderLocation
+  client: OrderLocation
+  rider?: OrderRider
+  cancelReason?: string
+  deliveredAt?: string
 }

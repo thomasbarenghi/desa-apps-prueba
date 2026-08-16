@@ -2,11 +2,13 @@ import { Badge, Box, Heading, HStack, Text, VStack } from "@chakra-ui/react"
 import Clock from "@gravity-ui/icons/Clock"
 import GeoPin from "@gravity-ui/icons/GeoPin"
 import Handset from "@gravity-ui/icons/Handset"
+import { BackButton } from "../../components/BackButton"
 import { MOCK_BRANCHES } from "../../utils/sucursales"
 
 export const SucursalesPage = () => {
   return (
     <VStack align="stretch" gap="6" maxW="3xl">
+      <BackButton />
       <VStack align="start" gap="1">
         <Heading as="h1" fontSize={{ base: "3xl", md: "4xl" }} fontWeight="bold">
           Sucursales

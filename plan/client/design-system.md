@@ -19,26 +19,39 @@
 | `/checkout` | CheckoutPage (carga de dirección + confirmación) | ✅ |
 | `/sucursales` | SucursalesPage (lista, datos mock) | ✅ |
 | `/pedidos` | OrdersPage (timeline + historial) | ✅ |
+| `/pedidos/:orderId` | OrderDetailPage (detalle con mapa de seguimiento para pedidos activos) | ✅ |
 | `/perfil` | ProfilePage | ✅ |
 | `/perfil/editar` | EditProfilePage | ✅ |
+| `/perfil/direcciones` | AddressesPage (CRUD de direcciones guardadas) | ✅ |
+| `/login` | LoginPage | ✅ |
+| `/registro` | RegisterPage | ✅ |
+| `/recuperar-contrasena` | ForgotPasswordPage | ✅ |
+| `/restablecer-contrasena/:token` | ResetPasswordPage | ✅ |
+
+Las rutas de la tienda están protegidas por el HOC `RequireAuth` (salvo las de auth). Por defecto exigen sesión; agregar `?forceAuth=true` a la URL desactiva la protección (el flag se persiste y se forwardea entre la navegación), y `?forceAuth=false` la reactiva.
 
 ### 1.2 Componentes (`apps/store/src/components/`)
 
-`CartButton`, `CartDrawer`, `CartLineCard`, `CategoryChip`, `ColorModeProvider` (+ `ColorModeButton`), `EmptyState`, `Logo`, `MobileStoreNavigation` (+ `MobileNavItem`), `OrderStatusBadge`, `ProductCard`, `QuantityStepper`, `SectionHeader`, `StoreHeader` (+ `DesktopNav`, `HeaderActions`).
+`AddressPickerModal` (+ `AddressForm`), `AuthSuccess`, `CartButton`, `CartDrawer`, `CartLineCard`, `CategoryChip`, `ColorModeProvider` (+ `ColorModeButton`), `EmptyState`, `LocationButton`, `Logo`, `MobileStoreNavigation` (+ `MobileNavItem`), `OrderStatusBadge`, `OrderTimeline`, `PasswordInput`, `ProductCard`, `QuantityStepper`, `SectionHeader`, `StoreHeader` (+ `DesktopNav`, `HeaderActions`).
 
 ### 1.3 Hooks, stores, utils, types
 
-- **hooks:** `useCatalog`, `useProduct`, `useProfile` (patrón SWR + fallback mock).
-- **stores:** `cartStore` (líneas de carrito con opciones/notas, `addLine`/`removeLine`/`setQuantity`/`clear`, y helpers `lineUnitPrice`/`lineTotal`/`cartItemCount`/`cartTotal`).
-- **utils:** `catalog.ts` (mock de categorías/productos + `formatPrice`), `orders.ts` (estados + mock), `sucursales.ts` (mock).
-- **types:** `catalog.ts`, `order.ts`, `user.ts`.
+- **hooks:** `useCatalog`, `useProduct`, `useProfile`, `useOrder` (patrón SWR + fallback mock).
+- **hoc:** `RequireAuth` (protege las rutas de la tienda; permite bypass con `?forceAuth=true`).
+- **layouts:** `StoreLayout`, `AuthLayout` (shell de las pantallas de auth: card centrada en desktop, full-screen en mobile).
+- **stores:** `cartStore` (líneas de carrito con opciones/notas, `addLine`/`removeLine`/`setQuantity`/`clear`, y helpers `lineUnitPrice`/`lineTotal`/`cartItemCount`/`cartTotal`), `addressStore` (direcciones guardadas + `selectedAddressId` con persistencia en `localStorage`, `selectAddress`/`addAddress`/`updateAddress`/`removeAddress`), `authStore` (sesión `user` + `bypassAuth` persistidos, `login`/`register`/`logout`/`setBypassAuth` mock).
+- **utils:** `catalog.ts` (mock de categorías/productos + `formatPrice`), `orders.ts` (estados + mock + `getOrderById`), `sucursales.ts` (mock), `addresses.ts` (mock de direcciones), `geoapify.ts` (`buildStaticMapUrl` para el mapa estático de seguimiento), `user.ts` (`MOCK_USER`).
+- **types:** `catalog.ts`, `order.ts`, `user.ts`, `address.ts`, `auth.ts`.
 
 ### 1.4 Datos mock (hasta que la API sea real)
 
 - 5 categorías, 13 productos con fotos de Unsplash.
+- 2 direcciones guardadas (mock) en `utils/addresses.ts`, semilladas en `addressStore`.
 - `useProfile` devuelve `MOCK_USER` ("Juan Pérez") cuando no hay `userId`.
 - `useCatalog`/`useProduct` intentan el endpoint `/api/...` y caen al mock si falla o no hay proxy (mismo patrón que `useProfile`).
 - Pedidos y sucursales: arrays mock en `utils/orders.ts` y `utils/sucursales.ts`.
+- 3 pedidos mock con detalle: 1 activo (`ON_THE_WAY`, con rider y coordenadas para el mapa), 1 entregado y 1 cancelado (con motivo).
+- Auth mock: `authStore` con `login`/`register` que simulan latencia (600ms) y devuelven `MOCK_USER` (o un usuario construido en `register`); la sesión persiste en `localStorage`.
 
 ---
 
@@ -80,8 +93,37 @@ Navegación como app nativa, **no una barra a todo el ancho**.
 
 ### 2.5 Timeline de pedido
 
-- Dots 14px + línea 2px (`brand.500` completado, `border.subtle` pendiente, `brand.600` actual). Labels `2xs`.
+- Dots 14px + línea 2px (`brand.500` completado, `border.subtle` pendiente, `brand.600` actual). Labels `2xs` `whiteSpace="nowrap"` con pasos cortos ("Preparando" en vez de "En preparación") para que no se corten en pantallas angostas.
 - Badge de estado: `OrderStatusBadge` = `Badge` `variant="subtle"` + punto `currentColor` + texto (color + ícono + texto, nunca color solo).
+
+### 2.6 Selector de dirección (`AddressPickerModal`)
+
+Aparece al cargar la app si no hay una dirección seleccionada; se reabre desde el chip del header (`LocationButton`).
+
+- **Desktop = modal centrado** (`DialogRoot` `placement="center"`), **mobile = bottom sheet** (`DrawerRoot` `placement="bottom"`). La variante se decide con `useMediaQuery(["(min-width: 48em)"])`.
+- **Chip del header (`LocationButton`)**: píldora `ghost` de una línea (`GeoPin` `brand.600` + calle `medium` + `ChevronDown`), `height="9"`. Visible en desktop siempre; en mobile solo en Inicio, Catálogo y Carrito.
+- Encabezado: ícono `GeoPin` en círculo `brand.600` sobre `bg.muted` (44px), título `xl` bold, subtítulo `fg.muted`.
+- Lista de direcciones: `Button` `variant="outline"` full-width (`height="auto"`, `borderColor="border.subtle"`, `borderRadius="xl"`), con label `semibold` + calle `fg.muted` + localidad `fg.subtle` + `ChevronRight`. Tap = selecciona y cierra.
+- "Agregar nueva dirección": `variant="ghost"` `brand.600` con `Plus`; cambia a un formulario (`Field.Root` + `Input` `bg="bg.subtle"` `borderRadius="xl"`). Si hay guardadas, el formulario tiene "Volver".
+- Bottom sheet: grabber (`w=10` `h=1` `border.emphasized`), `borderTopRadius="3xl"` y `paddingBottom` con `safe-area-inset-bottom`.
+- La selección persiste en `addressStore` (`localStorage`); no vuelve a preguntar mientras exista una seleccionada. En checkout se precarga la dirección seleccionada.
+
+### 2.7 Detalle de pedido (`OrderDetailPage`)
+
+- **Activo** (`PENDING`…`ON_THE_WAY`): timeline (`OrderTimeline`) + **mapa estático de seguimiento** (Geoapify `buildStaticMapUrl`) con 3 markers — tienda (`info`, texto "T"), dirección del cliente (`success`, texto "C") y rider (`brand`, ícono `person-biking`) — y una leyenda con punto de color + título + subtítulo.
+- **Cancelado**: card con `CircleXmarkFill` `danger` + motivo (`cancelReason`).
+- **Entregado**: card con `CircleCheckFill` `success` + fecha (`deliveredAt`).
+- Items (cantidad × nombre + subtotal) y total con `tabular-nums`. Atribución de mapa: "© OpenStreetMap · Geoapify".
+- Mapa = `Image` responsive (`width="100%"`) sobre card `bg.panel` `2xl` `overflow="hidden"`. Solo en pedidos activos.
+
+### 2.8 Autenticación (`AuthLayout` + páginas de auth)
+
+- **Desktop**: fondo `bg.muted`, card centrada `bg.panel` con `border.subtle` y `3xl` + `md` shadow, `maxW="sm"`, logo `48px` arriba.
+- **Mobile**: full-screen (sin card ni borde) sobre `bg`, logo arriba, campos `size="lg"` full-width y `paddingBottom` con `safe-area-inset-bottom` (look de app nativa).
+- Formularios: `Field.Root` + `Input` `bg="bg.subtle"` `xl`. Contraseñas con `PasswordInput` (`InputGroup` + `IconButton` ghost con `Eye`/`EyeClosed`).
+- Éxito de recuperar/restablecer: `AuthSuccess` (ícono `CircleCheckFill` `success` + título + descripción + CTA full-width).
+- CTA primario: `Button` `bg="brand.600"` `color="white"` `full` con `loading`/`disabled` mientras envía. Links de auth: `ChakraLink` `brand.600` `medium`.
+- `RequireAuth` protege las rutas de tienda; redirige a `/login` con `state.from` para volver al destino tras loguearse. Cierre de sesión en `ProfilePage` ("Cerrar sesión", outline `danger`).
 
 ---
 
@@ -114,11 +156,11 @@ Paleta completa: ver `ui-manifesto.md` §4 o `apps/*/src/theme.ts`.
 | Decisión | Porqué |
 |---|---|
 | Footer solo desktop | En mobile el dock + contenido alcanzan; el footer es ruido y quita protagonismo. |
-| Header mobile = solo logo | Menos UI. Carrito va en el dock; el toggle dark va en Perfil. |
+| Header mobile = logo + selector de dirección (solo Inicio y Catálogo) | Menos UI. Carrito va en el dock; el toggle dark va en Perfil. El selector de dirección es una acción contextual de descubrimiento (solo en las pantallas donde se navega el catálogo). |
 | Toggle dark en Perfil (mobile) | No es una acción frecuente; disclosure progresivo. |
 | Dark = negro + grises (no marrón) | El marrón ensucia en oscuro; el "calor" lo aporta el naranja sobre negro. |
 | Chevrons simples (`Chevron*`) | Las flechas dobles (`ArrowChevron*`) se ven raras. |
-| Dirección cargada en checkout | Es una verdad de producto: la entrega es a la dirección del cliente, no hay dirección por defecto ni "campus". |
+| Dirección cargada en checkout | Es una verdad de producto: la entrega es a la dirección del cliente, no hay dirección por defecto ni "campus". El selector de dirección al cargar (modal/bottom sheet) persiste la dirección elegida y precarga el checkout. |
 | Mock de respuestas | La API aún es stub; `SWR + fallback` mantiene el contrato y permite reemplazar por datos reales sin tocar la UI. |
 | Fotografía Unsplash art-directed | La imagen forma parte de la composición, no es un thumbnail decorativo. |
 | Menos cards | Estructura con tipografía, espacio y fondo antes que contenedores. |

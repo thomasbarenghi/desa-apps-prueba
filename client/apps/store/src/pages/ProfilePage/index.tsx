@@ -1,13 +1,23 @@
-import { Avatar, Box, Heading, Text, VStack } from "@chakra-ui/react"
+import { Avatar, Box, Button, Heading, Text, VStack } from "@chakra-ui/react"
 import Moon from "@gravity-ui/icons/Moon"
+import { useNavigate } from "react-router-dom"
 import { ColorModeButton } from "../../components/ColorModeProvider/ColorModeButton"
+import { routes } from "../../routes"
+import { useAuthStore } from "../../stores/authStore"
 import { useProfile } from "../../hooks/useProfile"
 import { ProfileNav } from "./ProfileNav"
 import type { ProfilePageProps } from "./types"
 
 export const ProfilePage = ({ userId }: ProfilePageProps) => {
   const { user } = useProfile(userId)
+  const logout = useAuthStore((state) => state.logout)
+  const navigate = useNavigate()
   const fullName = `${user?.firstName ?? ""} ${user?.lastName ?? ""}`.trim()
+
+  const handleLogout = () => {
+    logout()
+    navigate(routes.login, { replace: true })
+  }
 
   return (
     <Box maxW="xl" width="full" marginX="auto">
@@ -65,6 +75,18 @@ export const ProfilePage = ({ userId }: ProfilePageProps) => {
         </Box>
 
         <ProfileNav />
+
+        <Button
+          variant="outline"
+          width="full"
+          borderRadius="full"
+          borderColor="border.subtle"
+          color="danger"
+          _hover={{ borderColor: "danger", bg: "bg.muted" }}
+          onClick={handleLogout}
+        >
+          Cerrar sesión
+        </Button>
       </VStack>
     </Box>
   )

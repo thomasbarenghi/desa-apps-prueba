@@ -1,16 +1,6 @@
 import useSWR from "swr"
 import type { UpdateProfileInput, User } from "../types/user"
-
-const MOCK_USER: User = {
-  id: 1,
-  email: "juan.perez@unahur.edu.ar",
-  role: "client",
-  firstName: "Juan",
-  lastName: "Pérez",
-  phone: "+54 11 5555-1234",
-  active: true,
-  createdAt: new Date().toISOString(),
-}
+import { MOCK_USER } from "../utils/user"
 
 interface UseProfileReturn {
   user: User | undefined
