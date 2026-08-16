@@ -1,6 +1,7 @@
 import { Button, Field, Heading, Input, Link as ChakraLink, Text, VStack } from "@chakra-ui/react"
 import { Link } from "react-router-dom"
 import { PasswordInput } from "../../components/PasswordInput"
+import { routes } from "../../routes"
 import { useRegister } from "./hooks/useRegister"
 
 export const RegisterPage = () => {
@@ -131,7 +132,7 @@ export const RegisterPage = () => {
       <Text fontSize="sm" color="fg.muted" textAlign="center">
         ¿Ya tenés cuenta?{" "}
         <ChakraLink asChild color="brand.600" fontWeight="medium">
-          <Link to="/login">Ingresá</Link>
+          <Link to={routes.login}>Ingresá</Link>
         </ChakraLink>
       </Text>
     </VStack>

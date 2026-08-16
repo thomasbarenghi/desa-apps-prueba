@@ -1,6 +1,7 @@
 import { useState } from "react"
 import type { FormEvent } from "react"
 import { useLocation, useNavigate } from "react-router-dom"
+import { routes } from "../../../routes"
 import { useAuthStore } from "../../../stores/authStore"
 
 interface LocationState {
@@ -26,7 +27,7 @@ export const useLogin = () => {
     setError(null)
     try {
       await login(email.trim(), password)
-      const from = (location.state as LocationState | null)?.from?.pathname ?? "/"
+      const from = (location.state as LocationState | null)?.from?.pathname ?? routes.home
       navigate(from, { replace: true })
     } catch {
       setError("No pudimos iniciar sesión. Revisá tus datos.")

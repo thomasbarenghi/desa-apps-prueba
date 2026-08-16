@@ -3,6 +3,7 @@ import ShoppingCart from "@gravity-ui/icons/ShoppingCart"
 import { Link } from "react-router-dom"
 import { CartLineCard } from "../../components/CartLineCard"
 import { EmptyState } from "../../components/EmptyState"
+import { routes } from "../../routes"
 import { cartItemCount, cartTotal, useCartStore } from "../../stores/cartStore"
 import { formatPrice } from "../../utils/catalog"
 
@@ -22,7 +23,7 @@ export const CartPage = () => {
         description="Explorá el catálogo y armá tu pedido."
         action={
           <Button asChild bg="brand.600" color="white" borderRadius="full" _hover={{ bg: "brand.700" }}>
-            <Link to="/catalogo">Explorar productos</Link>
+            <Link to={routes.catalog}>Explorar productos</Link>
           </Button>
         }
       />
@@ -75,7 +76,7 @@ export const CartPage = () => {
               color="white"
               _hover={{ bg: "brand.700" }}
             >
-              <Link to="/checkout">Continuar con el pedido</Link>
+              <Link to={routes.checkout}>Continuar con el pedido</Link>
             </Button>
           </VStack>
         </Box>

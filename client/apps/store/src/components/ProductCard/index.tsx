@@ -1,6 +1,7 @@
 import { Box, HStack, IconButton, Image, Link as ChakraLink, Text } from "@chakra-ui/react"
 import Plus from "@gravity-ui/icons/Plus"
 import { NavLink } from "react-router-dom"
+import { productPath } from "../../routes"
 import { formatPrice } from "../../utils/catalog"
 import type { ProductCardProps } from "./types"
 
@@ -16,7 +17,7 @@ export const ProductCard = ({ product }: ProductCardProps) => {
       _hover={{ transform: "translateY(-2px)", boxShadow: "md" }}
     >
       <ChakraLink asChild display="block">
-        <NavLink to={`/productos/${product.id}`} aria-label={product.name}>
+        <NavLink to={productPath(product.id)} aria-label={product.name}>
           <Box aspectRatio="4 / 3" bg="bg.muted" overflow="hidden">
             <Image
               src={product.image}
@@ -32,7 +33,7 @@ export const ProductCard = ({ product }: ProductCardProps) => {
 
       <Box padding="4" paddingBottom="0">
         <ChakraLink asChild display="block">
-          <NavLink to={`/productos/${product.id}`}>
+          <NavLink to={productPath(product.id)}>
             <Text fontWeight="semibold" fontSize="md" color="fg">
               {product.name}
             </Text>
@@ -56,7 +57,7 @@ export const ProductCard = ({ product }: ProductCardProps) => {
           color="white"
           _hover={{ bg: "brand.700" }}
         >
-          <NavLink to={`/productos/${product.id}`}>
+          <NavLink to={productPath(product.id)}>
             <Plus width={16} height={16} />
           </NavLink>
         </IconButton>

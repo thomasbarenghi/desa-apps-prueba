@@ -11,6 +11,7 @@ export const BackButton = () => {
       aria-label="Volver"
       borderRadius="full"
       alignSelf="flex-start"
+      display={{ base: "inline-flex", md: "none" }}
       onClick={() => navigate(-1)}
     >
       <ArrowLeft width={22} height={22} />

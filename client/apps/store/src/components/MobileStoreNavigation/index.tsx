@@ -1,5 +1,6 @@
 import { Box, HStack } from "@chakra-ui/react"
 import { useLocation } from "react-router-dom"
+import { routes } from "../../routes"
 import { useCartCount } from "../CartButton/hooks/useCartCount"
 import { MobileNavItem } from "./MobileNavItem"
 import { mobileNavItems } from "./utils/navigation"
@@ -9,7 +10,7 @@ export const MobileStoreNavigation = () => {
   const { count } = useCartCount()
 
   const isActive = (path: string) => {
-    if (path === "/") return pathname === "/"
+    if (path === routes.home) return pathname === routes.home
     return pathname.startsWith(path)
   }
 

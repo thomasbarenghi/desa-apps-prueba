@@ -2,6 +2,7 @@ import { Routes, Route } from "react-router-dom";
 import { StoreLayout } from "./layouts/StoreLayout";
 import { AuthLayout } from "./layouts/AuthLayout";
 import { RequireAuth } from "./hoc/RequireAuth";
+import { routes } from "./routes";
 import { HomePage } from "./pages/HomePage";
 import { CatalogPage } from "./pages/CatalogPage";
 import { ProductDetailPage } from "./pages/ProductDetailPage";
@@ -22,24 +23,24 @@ export const App = () => {
   return (
     <Routes>
       <Route element={<AuthLayout />}>
-        <Route path="/login" element={<LoginPage />} />
-        <Route path="/registro" element={<RegisterPage />} />
-        <Route path="/recuperar-contrasena" element={<ForgotPasswordPage />} />
-        <Route path="/restablecer-contrasena/:token" element={<ResetPasswordPage />} />
+        <Route path={routes.login} element={<LoginPage />} />
+        <Route path={routes.register} element={<RegisterPage />} />
+        <Route path={routes.forgotPassword} element={<ForgotPasswordPage />} />
+        <Route path={routes.resetPassword} element={<ResetPasswordPage />} />
       </Route>
       <Route element={<RequireAuth />}>
         <Route element={<StoreLayout />}>
           <Route index element={<HomePage />} />
-          <Route path="/catalogo" element={<CatalogPage />} />
-          <Route path="/productos/:productId" element={<ProductDetailPage />} />
-          <Route path="/carrito" element={<CartPage />} />
-          <Route path="/checkout" element={<CheckoutPage />} />
-          <Route path="/sucursales" element={<SucursalesPage />} />
-          <Route path="/pedidos" element={<OrdersPage />} />
-          <Route path="/pedidos/:orderId" element={<OrderDetailPage />} />
-          <Route path="/perfil" element={<ProfilePage />} />
-          <Route path="/perfil/editar" element={<EditProfilePage />} />
-          <Route path="/perfil/direcciones" element={<AddressesPage />} />
+          <Route path={routes.catalog} element={<CatalogPage />} />
+          <Route path={routes.product} element={<ProductDetailPage />} />
+          <Route path={routes.cart} element={<CartPage />} />
+          <Route path={routes.checkout} element={<CheckoutPage />} />
+          <Route path={routes.branches} element={<SucursalesPage />} />
+          <Route path={routes.orders} element={<OrdersPage />} />
+          <Route path={routes.orderDetail} element={<OrderDetailPage />} />
+          <Route path={routes.profile} element={<ProfilePage />} />
+          <Route path={routes.profileEdit} element={<EditProfilePage />} />
+          <Route path={routes.profileAddresses} element={<AddressesPage />} />
         </Route>
       </Route>
     </Routes>

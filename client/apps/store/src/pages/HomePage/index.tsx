@@ -20,6 +20,7 @@ import { Link, useNavigate } from "react-router-dom"
 import { CategoryChip } from "../../components/CategoryChip"
 import { ProductCard } from "../../components/ProductCard"
 import { SectionHeader } from "../../components/SectionHeader"
+import { routes } from "../../routes"
 import { useCatalog } from "../../hooks/useCatalog"
 import { useProfile } from "../../hooks/useProfile"
 
@@ -46,7 +47,7 @@ export const HomePage = () => {
           title="Explorá por categoría"
           action={
             <ChakraLink asChild color="brand.600" fontWeight="semibold" fontSize="sm">
-              <Link to="/catalogo">Ver todo</Link>
+              <Link to={routes.catalog}>Ver todo</Link>
             </ChakraLink>
           }
         />
@@ -56,7 +57,7 @@ export const HomePage = () => {
               key={category.id}
               label={category.name}
               active={false}
-              onClick={() => navigate(`/catalogo?cat=${category.id}`)}
+              onClick={() => navigate(`${routes.catalog}?cat=${category.id}`)}
             />
           ))}
         </Flex>
@@ -68,7 +69,7 @@ export const HomePage = () => {
           title="Los más pedidos"
           action={
             <ChakraLink asChild color="brand.600" fontWeight="semibold" fontSize="sm">
-              <Link to="/catalogo">Ver todo el catálogo</Link>
+              <Link to={routes.catalog}>Ver todo el catálogo</Link>
             </ChakraLink>
           }
         />
@@ -103,9 +104,9 @@ export const HomePage = () => {
       <Box as="footer" borderTop="1px" borderColor="border.subtle" paddingTop="8" paddingBottom="2" display={{ base: "none", md: "flex" }} justifyContent="space-between" gap="4" color="fg.muted" fontSize="sm">
         <Text>UNaHur · Comida al instante</Text>
         <HStack gap="5">
-          <ChakraLink asChild><Link to="/catalogo">Catálogo</Link></ChakraLink>
-          <ChakraLink asChild><Link to="/sucursales">Sucursales</Link></ChakraLink>
-          <ChakraLink asChild><Link to="/perfil">Perfil</Link></ChakraLink>
+          <ChakraLink asChild><Link to={routes.catalog}>Catálogo</Link></ChakraLink>
+          <ChakraLink asChild><Link to={routes.branches}>Sucursales</Link></ChakraLink>
+          <ChakraLink asChild><Link to={routes.profile}>Perfil</Link></ChakraLink>
         </HStack>
       </Box>
     </VStack>
@@ -135,10 +136,10 @@ const Hero = ({ userFirstName }: { userFirstName?: string }) => {
           </Text>
           <HStack gap="3" flexWrap="wrap">
             <Button asChild size="lg" borderRadius="full" paddingX="7" bg="brand.600" color="white" _hover={{ bg: "brand.700" }}>
-              <Link to="/catalogo">Pedir ahora</Link>
+              <Link to={routes.catalog}>Pedir ahora</Link>
             </Button>
             <Button asChild size="lg" borderRadius="full" paddingX="7" variant="outline" color="fg" borderColor="border.emphasized" _hover={{ bg: "bg.muted" }}>
-              <Link to="/sucursales">Ver sucursales</Link>
+              <Link to={routes.branches}>Ver sucursales</Link>
             </Button>
           </HStack>
         </VStack>
@@ -178,7 +179,7 @@ const DeliveryBanner = () => {
           </Text>
         </VStack>
         <Button asChild size="lg" borderRadius="full" paddingX="7" bg="white" color="brand.700" _hover={{ bg: "brand.100" }}>
-          <Link to="/sucursales">Conocer sucursales</Link>
+          <Link to={routes.branches}>Conocer sucursales</Link>
         </Button>
       </Grid>
     </Box>

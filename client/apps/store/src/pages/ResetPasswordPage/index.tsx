@@ -1,6 +1,7 @@
 import { Button, Field, Heading, Text, VStack } from "@chakra-ui/react"
 import { AuthSuccess } from "../../components/AuthSuccess"
 import { PasswordInput } from "../../components/PasswordInput"
+import { routes } from "../../routes"
 import { useResetPassword } from "./hooks/useResetPassword"
 
 export const ResetPasswordPage = () => {
@@ -22,7 +23,7 @@ export const ResetPasswordPage = () => {
         title="Contraseña restablecida"
         description="Ya podés ingresar con tu nueva contraseña."
         buttonLabel="Ir al login"
-        to="/login"
+        to={routes.login}
       />
     )
   }

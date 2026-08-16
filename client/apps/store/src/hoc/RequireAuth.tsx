@@ -1,5 +1,6 @@
 import { useEffect } from "react"
 import { Navigate, Outlet, useLocation } from "react-router-dom"
+import { routes } from "../routes"
 import { useAuthStore } from "../stores/authStore"
 
 export const RequireAuth = () => {
@@ -18,7 +19,7 @@ export const RequireAuth = () => {
   const effectiveBypass = param === "false" ? false : param === "true" ? true : bypassAuth
 
   if (!user && !effectiveBypass) {
-    return <Navigate to="/login" replace state={{ from: location }} />
+    return <Navigate to={routes.login} replace state={{ from: location }} />
   }
 
   return <Outlet />

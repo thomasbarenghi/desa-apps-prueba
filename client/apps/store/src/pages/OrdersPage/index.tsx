@@ -4,6 +4,7 @@ import { Link } from "react-router-dom"
 import { EmptyState } from "../../components/EmptyState"
 import { OrderStatusBadge } from "../../components/OrderStatusBadge"
 import { OrderTimeline } from "../../components/OrderTimeline"
+import { orderDetailPath, routes } from "../../routes"
 import { formatPrice } from "../../utils/catalog"
 import { formatOrderDate, isActiveOrder, MOCK_ORDERS } from "../../utils/orders"
 
@@ -41,7 +42,7 @@ export const OrdersPage = () => {
             color="white"
             _hover={{ bg: "brand.700" }}
           >
-            <Link to={`/pedidos/${activeOrder.id}`}>Ver seguimiento</Link>
+            <Link to={orderDetailPath(activeOrder.id)}>Ver seguimiento</Link>
           </Button>
         </Box>
       ) : null}
@@ -59,7 +60,7 @@ export const OrdersPage = () => {
             padding="5"
             _hover={{ borderColor: "border.emphasized" }}
           >
-            <Link to={`/pedidos/${order.id}`}>
+            <Link to={orderDetailPath(order.id)}>
               <HStack justify="space-between">
                 <VStack align="start" gap="0.5">
                   <Text fontWeight="semibold">Pedido #{order.number}</Text>
@@ -89,7 +90,7 @@ export const OrdersPage = () => {
           description="Cuando hagas tu primer pedido, lo vas a ver acá."
           action={
             <Button asChild bg="brand.600" color="white" borderRadius="full" _hover={{ bg: "brand.700" }}>
-              <Link to="/catalogo">Ir al catálogo</Link>
+              <Link to={routes.catalog}>Ir al catálogo</Link>
             </Button>
           }
         />

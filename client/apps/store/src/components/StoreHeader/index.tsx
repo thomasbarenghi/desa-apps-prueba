@@ -1,5 +1,6 @@
 import { Box, Container, Flex, Link as ChakraLink, useDisclosure } from "@chakra-ui/react"
 import { NavLink, useLocation } from "react-router-dom"
+import { routes } from "../../routes"
 import { CartDrawer } from "../CartDrawer"
 import { Logo } from "../Logo"
 import { DesktopNav } from "./DesktopNav"
@@ -7,7 +8,7 @@ import { HeaderActions } from "./HeaderActions"
 import { useStoreNavigation } from "./hooks/useStoreNavigation"
 import type { StoreHeaderProps } from "./types"
 
-const MOBILE_LOCATION_PATHS = ["/", "/catalogo", "/carrito"]
+const MOBILE_LOCATION_PATHS: string[] = [routes.home, routes.catalog, routes.cart]
 
 export const StoreHeader = ({ onOpenLocation }: StoreHeaderProps) => {
   const { navItems, isActive } = useStoreNavigation()
@@ -20,7 +21,7 @@ export const StoreHeader = ({ onOpenLocation }: StoreHeaderProps) => {
       <Container maxW="1200px">
         <Flex h="16" align="center" justify="space-between" gap="4">
           <ChakraLink asChild>
-            <NavLink to="/" aria-label="Ir al inicio">
+            <NavLink to={routes.home} aria-label="Ir al inicio">
               <Logo height="40px" />
             </NavLink>
           </ChakraLink>

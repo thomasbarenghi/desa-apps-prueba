@@ -1,6 +1,7 @@
 import { Button, Field, Heading, Input, Link as ChakraLink, Text, VStack } from "@chakra-ui/react"
 import { Link } from "react-router-dom"
 import { AuthSuccess } from "../../components/AuthSuccess"
+import { routes } from "../../routes"
 import { useForgotPassword } from "./hooks/useForgotPassword"
 
 export const ForgotPasswordPage = () => {
@@ -12,7 +13,7 @@ export const ForgotPasswordPage = () => {
         title="Revisá tu email"
         description={`Te enviamos un enlace para restablecer tu contraseña a ${email}.`}
         buttonLabel="Volver al login"
-        to="/login"
+        to={routes.login}
       />
     )
   }
@@ -60,7 +61,7 @@ export const ForgotPasswordPage = () => {
 
       <Text fontSize="sm" color="fg.muted" textAlign="center">
         <ChakraLink asChild color="brand.600" fontWeight="medium">
-          <Link to="/login">Volver al login</Link>
+          <Link to={routes.login}>Volver al login</Link>
         </ChakraLink>
       </Text>
     </VStack>

@@ -17,6 +17,7 @@ import { EmptyState } from "../../components/EmptyState"
 import { OrderStatusBadge } from "../../components/OrderStatusBadge"
 import { OrderTimeline } from "../../components/OrderTimeline"
 import { useOrder } from "../../hooks/useOrder"
+import { routes } from "../../routes"
 import type { Order } from "../../types/order"
 import { formatPrice } from "../../utils/catalog"
 import { buildStaticMapUrl } from "../../utils/geoapify"
@@ -42,7 +43,7 @@ export const OrderDetailPage = () => {
         description="No pudimos encontrar este pedido. Probá desde la lista de pedidos."
         action={
           <Button asChild bg="brand.600" color="white" borderRadius="full" _hover={{ bg: "brand.700" }}>
-            <Link to="/pedidos">Volver a mis pedidos</Link>
+            <Link to={routes.orders}>Volver a mis pedidos</Link>
           </Button>
         }
       />

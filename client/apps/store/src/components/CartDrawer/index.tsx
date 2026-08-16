@@ -16,6 +16,7 @@ import {
 } from "@chakra-ui/react"
 import ShoppingCart from "@gravity-ui/icons/ShoppingCart"
 import { Link } from "react-router-dom"
+import { routes } from "../../routes"
 import { cartTotal, useCartStore } from "../../stores/cartStore"
 import { formatPrice } from "../../utils/catalog"
 import { CartLineCard } from "../CartLineCard"
@@ -77,7 +78,7 @@ export const CartDrawer = ({ open, onClose }: CartDrawerProps) => {
                   _hover={{ bg: "brand.700" }}
                   onClick={onClose}
                 >
-                  <Link to={isEmpty ? "/catalogo" : "/carrito"}>
+                  <Link to={isEmpty ? routes.catalog : routes.cart}>
                     {isEmpty ? "Explorar productos" : "Ver carrito y confirmar"}
                   </Link>
                 </Button>

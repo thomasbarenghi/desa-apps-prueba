@@ -1,6 +1,7 @@
 import { Box, Link as ChakraLink, HStack } from "@chakra-ui/react"
 import Person from "@gravity-ui/icons/Person"
 import { NavLink } from "react-router-dom"
+import { routes } from "../../routes"
 import { CartButton } from "../CartButton"
 import { ColorModeButton } from "../ColorModeProvider/ColorModeButton"
 import { LocationButton } from "../LocationButton"
@@ -36,7 +37,7 @@ export const HeaderActions = ({
         color="fg.muted"
         _hover={{ color: "fg", bg: "bg.muted" }}
       >
-        <NavLink to="/perfil">
+        <NavLink to={routes.profile}>
           <Person width={20} height={20} />
         </NavLink>
       </ChakraLink>

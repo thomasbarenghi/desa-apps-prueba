@@ -2,6 +2,7 @@ import { Avatar, Box, Button, Heading, Text, VStack } from "@chakra-ui/react"
 import Moon from "@gravity-ui/icons/Moon"
 import { useNavigate } from "react-router-dom"
 import { ColorModeButton } from "../../components/ColorModeProvider/ColorModeButton"
+import { routes } from "../../routes"
 import { useAuthStore } from "../../stores/authStore"
 import { useProfile } from "../../hooks/useProfile"
 import { ProfileNav } from "./ProfileNav"
@@ -15,7 +16,7 @@ export const ProfilePage = ({ userId }: ProfilePageProps) => {
 
   const handleLogout = () => {
     logout()
-    navigate("/login", { replace: true })
+    navigate(routes.login, { replace: true })
   }
 
   return (

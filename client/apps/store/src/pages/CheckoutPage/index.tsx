@@ -4,6 +4,7 @@ import { useState } from "react"
 import { Link } from "react-router-dom"
 import { BackButton } from "../../components/BackButton"
 import { EmptyState } from "../../components/EmptyState"
+import { routes } from "../../routes"
 import { cartTotal, lineTotal, useCartStore } from "../../stores/cartStore"
 import { selectedAddress, useAddressStore } from "../../stores/addressStore"
 import { formatPrice } from "../../utils/catalog"
@@ -37,10 +38,10 @@ export const CheckoutPage = () => {
         </VStack>
         <HStack gap="3" flexWrap="wrap" justifyContent="center" marginTop="2">
           <Button asChild size="lg" borderRadius="full" paddingX="7" bg="brand.600" color="white" _hover={{ bg: "brand.700" }}>
-            <Link to="/pedidos">Ver mis pedidos</Link>
+            <Link to={routes.orders}>Ver mis pedidos</Link>
           </Button>
           <Button asChild size="lg" borderRadius="full" paddingX="7" variant="outline" color="fg" borderColor="border.emphasized">
-            <Link to="/">Volver al inicio</Link>
+            <Link to={routes.home}>Volver al inicio</Link>
           </Button>
         </HStack>
       </VStack>
@@ -54,7 +55,7 @@ export const CheckoutPage = () => {
         description="Tu carrito está vacío. Sumá productos antes de continuar."
         action={
           <Button asChild bg="brand.600" color="white" borderRadius="full" _hover={{ bg: "brand.700" }}>
-            <Link to="/catalogo">Ir al catálogo</Link>
+            <Link to={routes.catalog}>Ir al catálogo</Link>
           </Button>
         }
       />

@@ -1,6 +1,7 @@
 import { useState } from "react"
 import type { FormEvent } from "react"
 import { useNavigate } from "react-router-dom"
+import { routes } from "../../../routes"
 import { useAuthStore } from "../../../stores/authStore"
 
 export const useRegister = () => {
@@ -36,7 +37,7 @@ export const useRegister = () => {
         phone: phone.trim(),
         password,
       })
-      navigate("/", { replace: true })
+      navigate(routes.home, { replace: true })
     } finally {
       setSubmitting(false)
     }

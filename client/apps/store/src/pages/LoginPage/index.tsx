@@ -1,6 +1,7 @@
 import { Button, Field, Heading, HStack, Input, Link as ChakraLink, Text, VStack } from "@chakra-ui/react"
 import { Link } from "react-router-dom"
 import { PasswordInput } from "../../components/PasswordInput"
+import { routes } from "../../routes"
 import { useLogin } from "./hooks/useLogin"
 
 export const LoginPage = () => {
@@ -66,10 +67,10 @@ export const LoginPage = () => {
 
       <HStack justify="space-between" fontSize="sm" flexWrap="wrap" gap="2">
         <ChakraLink asChild color="brand.600" fontWeight="medium">
-          <Link to="/recuperar-contrasena">Olvidé mi contraseña</Link>
+          <Link to={routes.forgotPassword}>Olvidé mi contraseña</Link>
         </ChakraLink>
         <ChakraLink asChild color="brand.600" fontWeight="medium">
-          <Link to="/registro">Crear cuenta</Link>
+          <Link to={routes.register}>Crear cuenta</Link>
         </ChakraLink>
       </HStack>
     </VStack>

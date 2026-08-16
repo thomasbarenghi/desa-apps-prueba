@@ -15,6 +15,7 @@ import { Link, useNavigate, useParams } from "react-router-dom"
 import { BackButton } from "../../components/BackButton"
 import { EmptyState } from "../../components/EmptyState"
 import { QuantityStepper } from "../../components/QuantityStepper"
+import { routes } from "../../routes"
 import { formatPrice, getCategoryName } from "../../utils/catalog"
 import { useProductConfig } from "./hooks/useProductConfig"
 
@@ -44,7 +45,7 @@ export const ProductDetailPage = () => {
         description="El producto que buscás no existe o ya no está disponible."
         action={
           <Button asChild bg="brand.600" color="white" borderRadius="full">
-            <Link to="/catalogo">Volver al catálogo</Link>
+            <Link to={routes.catalog}>Volver al catálogo</Link>
           </Button>
         }
       />
@@ -130,7 +131,7 @@ export const ProductDetailPage = () => {
               disabled={!config.canAdd}
               onClick={() => {
                 config.addToCart()
-                navigate("/carrito")
+                navigate(routes.cart)
               }}
             >
               Agregar al carrito
