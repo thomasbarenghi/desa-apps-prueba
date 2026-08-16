@@ -1,9 +1,7 @@
 import { Box, VStack } from "@chakra-ui/react"
 import CircleCheckFill from "@gravity-ui/icons/CircleCheckFill"
 import { Link } from "react-router-dom"
-import { PrimaryButton } from "../Button"
-import { Muted } from "../Muted"
-import { Strong } from "../Strong"
+import { Muted, PrimaryButton, Strong } from "@repo/components"
 import type { AuthSuccessProps } from "./types"
 
 export const AuthSuccess = ({ title, description, buttonLabel, to }: AuthSuccessProps) => {

@@ -1,31 +1,29 @@
-import { useForm } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
-import { useState } from 'react'
-import type { z } from 'zod'
-import { useNavigate } from 'react-router-dom'
-import { registerSchema } from '@repo/domain'
-import { routes } from '../../../routes'
-import { useAuthStore } from '@repo/api'
+import { useForm } from "react-hook-form"
+import { zodResolver } from "@hookform/resolvers/zod"
+import { useState } from "react"
+import type { z } from "zod"
+import { registerSchema } from "@repo/domain"
+import { useAuthStore } from "@repo/api"
+import { redirectByRole } from "../../../config"
 
 type RegisterValues = z.infer<typeof registerSchema>
 
 export const useRegister = () => {
   const register = useAuthStore((state) => state.register)
-  const navigate = useNavigate()
   const [submitting, setSubmitting] = useState(false)
 
   const form = useForm<RegisterValues>({
     resolver: zodResolver(registerSchema),
     defaultValues: {
-      firstName: '',
-      lastName: '',
-      email: '',
-      phone: '',
-      password: '',
-      confirm: '',
+      firstName: "",
+      lastName: "",
+      email: "",
+      phone: "",
+      password: "",
+      confirm: "",
     },
-    mode: 'onTouched',
-    reValidateMode: 'onChange',
+    mode: "onTouched",
+    reValidateMode: "onChange",
   })
 
   const onSubmit = form.handleSubmit(async (values) => {
@@ -38,7 +36,7 @@ export const useRegister = () => {
         phone: values.phone.trim(),
         password: values.password,
       })
-      navigate(routes.home, { replace: true })
+      redirectByRole("client")
     } finally {
       setSubmitting(false)
     }

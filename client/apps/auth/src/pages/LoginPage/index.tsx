@@ -1,11 +1,12 @@
-import { HStack, Text, VStack } from '@chakra-ui/react'
-import { FormProvider } from 'react-hook-form'
-import { FormField, FormPasswordField, PageHeader, PrimaryButton, TextLink } from '@repo/components'
-import { routes } from '../../routes'
-import { useLogin } from './hooks/useLogin'
+import { Box, HStack, Text, VStack } from "@chakra-ui/react"
+import { FormProvider } from "react-hook-form"
+import { FormField, FormPasswordField, Muted, PrimaryButton, SecondaryButton, TextLink } from "@repo/components"
+import { PageHeader } from "../../components/PageHeader"
+import { routes } from "../../routes"
+import { useLogin } from "./hooks/useLogin"
 
 export const LoginPage = () => {
-  const { form, submitting, error, onSubmit } = useLogin()
+  const { form, submitting, error, onSubmit, mockLogin } = useLogin()
 
   return (
     <VStack gap="8" align="stretch">
@@ -34,12 +35,7 @@ export const LoginPage = () => {
                 {error}
               </Text>
             ) : null}
-            <PrimaryButton
-              type="submit"
-              disabled={!form.formState.isValid || submitting}
-              loading={submitting}
-              marginTop="2"
-            >
+            <PrimaryButton type="submit" disabled={!form.formState.isValid || submitting} loading={submitting} marginTop="2">
               Ingresar
             </PrimaryButton>
           </VStack>
@@ -50,6 +46,21 @@ export const LoginPage = () => {
         <TextLink to={routes.forgotPassword}>Olvidé mi contraseña</TextLink>
         <TextLink to={routes.register}>Crear cuenta</TextLink>
       </HStack>
+
+      <Box>
+        <Box borderTop="1px solid" borderColor="border.subtle" marginBottom="3" />
+        <Muted fontSize="xs" textAlign="center" marginBottom="2">
+          Solo para desarrollo
+        </Muted>
+        <HStack gap="2" justify="center">
+          <SecondaryButton size="sm" onClick={() => mockLogin("client")}>
+            Mock cliente
+          </SecondaryButton>
+          <SecondaryButton size="sm" onClick={() => mockLogin("admin")}>
+            Mock admin
+          </SecondaryButton>
+        </HStack>
+      </Box>
     </VStack>
   )
 }

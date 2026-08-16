@@ -1,6 +1,8 @@
 import { useLocation } from "react-router-dom"
-import { AuthLayout as SharedAuthLayout, BackButton } from "@repo/components"
-import { Logo } from "../../components/Logo"
+import { AuthLayout as SharedAuthLayout } from "../../components/AuthLayout"
+import { BackButton, Logo } from "@repo/components"
+import logoLight from "../../assets/logo-light.svg"
+import logoDark from "../../assets/logo-dark.svg"
 import { routes } from "../../routes"
 
 const LOGIN_IMAGE =
@@ -13,7 +15,7 @@ export const AuthLayout = () => {
   return (
     <SharedAuthLayout
       image={LOGIN_IMAGE}
-      leading={isLogin ? <Logo height="40px" /> : <BackButton />}
+      leading={isLogin ? <Logo lightSrc={logoLight} darkSrc={logoDark} height="40px" /> : <BackButton />}
     />
   )
 }

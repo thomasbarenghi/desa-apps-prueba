@@ -122,7 +122,7 @@ Definida en `@repo/theme` (`packages/theme/src/config.ts`) como tokens semántic
 - Escala (ratio ~1.25): caption 12 · body 14/16 · h4 18 · h3 22 · h2 28 · h1 32 · display 44.
 - Headings `fontWeight="bold"` (700), tracking negativo en tamaños grandes, `textWrap="balance"`.
 - `tabular-nums` en números dinámicos (precios, contadores).
-- **Tipografía tokenizada** (`@repo/components`): `PageTitle` (h1 de página), `SectionTitle` (h2 de sección), `PageHeader` (auth), `Eyebrow` (overline uppercase), `Lead`, `Strong` (semibold), `Muted` (`fg.muted`), `Subtle` (`fg.subtle`), `Price` (semibold + `tabular-nums`), `TextLink` (enlace `brand.600`). No componer `Heading`/`Text` con props de estilo repetidas: usar el token.
+- **Tipografía tokenizada** (`@repo/components`): `PageTitle` (h1 de página), `SectionTitle` (h2 de sección), `Eyebrow` (overline uppercase), `Lead`, `Strong` (semibold), `Muted` (`fg.muted`), `Subtle` (`fg.subtle`), `Price` (semibold + `tabular-nums`), `TextLink` (enlace `brand.600`). No componer `Heading`/`Text` con props de estilo repetidas: usar el token.
 
 ### 5.2 Geometría y profundidad
 
@@ -194,7 +194,7 @@ Dos contenedores de página, unificados en `@repo/components`. **Ninguna página
 
 - **`PageContainer`** — angosto (`maxW="2xl"`, centrado, `gap="6"`). Para formularios/detalle: Mis direcciones, Sucursales, Editar perfil, Mi perfil, Mis pedidos, Detalle de pedido, Checkout.
 - **`WidePageContainer`** — full-width (hasta el `Container maxW="1200px"` del `StoreLayout`, `gap={{ base: "8", md: "12" }}`). Para listados y páginas amplias: Inicio, Catálogo, Carrito, Detalle de producto.
-- Las páginas de **auth** (login/registro/recuperar/restablecer) viven dentro del shell `AuthLayout` (columna 480px + imagen), sin contenedor de página.
+- La **autenticación es su propia app** (`apps/auth`, puerto 5175): login/registro/recuperar/restablecer viven ahí, dentro del shell `AuthLayout` (columna 480px + imagen). Tras loguearse redirige a `store` o `admin` según el `role`. Store y admin no tienen UI de auth propia.
 
 ### 5.12 Tokens de diseño (`@repo/components`)
 
@@ -202,14 +202,14 @@ Dos contenedores de página, unificados en `@repo/components`. **Ninguna página
 
 | Categoría | Tokens |
 |---|---|
-| Tipografía | `PageTitle`, `SectionTitle`, `PageHeader`, `Eyebrow`, `Lead`, `Strong`, `Muted`, `Subtle`, `Price`, `TextLink` |
+| Tipografía | `PageTitle`, `SectionTitle`, `Eyebrow`, `Lead`, `Strong`, `Muted`, `Subtle`, `Price`, `TextLink` |
 | Botones | `PrimaryButton`, `SecondaryButton`, `InverseButton`, `GhostButton`, `OutlineButton` |
 | Formularios | `TextField`, `PasswordField`, `TextAreaField`, `PasswordInput`, `SearchInput` + `FormField`, `FormPasswordField`, `FormTextAreaField` (React Hook Form) |
 | Layout | `PageContainer`, `WidePageContainer`, `Footer`, `ResponsiveModal` (dialog + bottom-sheet), `SidePanel` |
 | Navegación | `MobileNav`, `ChipCarousel` |
-| Feedback | `EmptyState`, `AuthSuccess`, `SplashScreen` |
+| Feedback | `EmptyState`, `SplashScreen` |
 | Dominio | `OrderStatusBadge`, `OrderTimeline` |
-| Base | `Logo`, `BackButton`, `ColorModeProvider`/`ColorModeButton`, `QuantityStepper`, `Chip`, `SectionHeader`, `RequireAuth`, `AuthLayout` |
+| Base | `Logo`, `BackButton`, `ColorModeProvider`/`ColorModeButton`, `QuantityStepper`, `Chip`, `SectionHeader`, `RequireAuth` |
 
 - **Botones** ya traen `size`/`radius`/colores; solo `children` + props semánticas (`asChild`, `type`, `disabled`, `loading`, `width`, `onClick`). No re-estilizar.
 - **Campos** (`TextField`/`PasswordField`/`TextAreaField`) ya traen `size="lg"`, `borderRadius="xl"`, `bg="bg.panel"` y el patrón de validación (`required` + `invalid` + `errorText`).
@@ -218,9 +218,17 @@ Dos contenedores de página, unificados en `@repo/components`. **Ninguna página
 
 ---
 
-## 6. Inventario implementado (store)
+## 6. Inventario implementado
 
-### 6.1 Rutas (`apps/store/src/App.tsx`)
+### 6.1 Apps
+
+| App | Puerto (dev) | Rol |
+|---|---|---|
+| `apps/auth` | 5175 | Autenticación (login/registro/recuperar). Tras el login redirige a `store` o `admin` según el `role` del auth API (`src/config.ts`, `VITE_STORE_URL`/`VITE_ADMIN_URL`). |
+| `apps/store` | 5173 | Cliente (catálogo, carrito, pedidos, perfil). |
+| `apps/admin` | 5174 | Administración (aún base). |
+
+### 6.2 Rutas de la tienda (`apps/store/src/App.tsx`)
 
 | Ruta | Página |
 |---|---|
@@ -239,20 +247,20 @@ Dos contenedores de página, unificados en `@repo/components`. **Ninguna página
 
 Las rutas de tienda están protegidas por el HOC `RequireAuth` (salvo las de auth). Por defecto exigen sesión; `?forceAuth=true` desactiva la protección (el flag se persiste y se forwardea entre la navegación), y `?forceAuth=false` la reactiva.
 
-### 6.2 Componentes
+### 6.3 Componentes
 
 - **Store (`apps/store/src/components/`):** `AddressPickerModal` (+ `AddressForm`), `CartButton`, `CartDrawer`, `CartLineCard`, `LocationButton`, `MobileStoreNavigation` (wrapper configurable del `MobileNav` genérico), `ProductCard`, `StoreHeader` (+ `DesktopNav`, `HeaderActions`).
 - **Compartidos (`@repo/components`):** ver §5.12 (inventario completo de tokens). Los SVG del logo viven en `apps/*/src/assets/`; `Logo` recibe `lightSrc`/`darkSrc`.
 
-### 6.3 Hooks, stores, utils, types
+### 6.4 Hooks, stores, utils, types
 
 - **hooks (`@repo/api`):** `useCatalog`, `useProduct`, `useProfile`, `useOrder` (patrón SWR + fallback mock), más mocks (`MOCK_CATEGORIES`, `MOCK_PRODUCTS`, `MOCK_ORDERS`, `MOCK_USER`).
 - **stores (`@repo/api`):** `authStore` (`useAuthStore`: sesión `user` + `bypassAuth` persistidos, `login(email, role?)`/`register`/`logout`/`setBypassAuth` mock). Store-local: `cartStore`, `addressStore` (direcciones guardadas + `selectedAddressId` con persistencia en `localStorage`).
-- **layouts:** `StoreLayout` (store) + `AuthLayout` (shell genérico de auth en `@repo/components`).
+- **layouts:** `StoreLayout` (store). El shell `AuthLayout`, `AuthSuccess` y `PageHeader` viven en `apps/auth/src/components/` (específicos de la app de auth).
 - **utils (store):** `sucursales.ts` (mock), `addresses.ts` (mock de direcciones), `geoapify.ts` (`buildStaticMapUrl`).
 - **tipos/constantes (`@repo/domain`):** `order`, `order-status`, `catalog`, `user`, `address`, `branch`, `auth` (`LoginInput`/`RegisterInput`), `format`. La tienda ya no define tipos de dominio propios.
 
-### 6.4 Datos mock (hasta que la API sea real)
+### 6.5 Datos mock (hasta que la API sea real)
 
 - 5 categorías, 13 productos con fotos de Unsplash.
 - 2 direcciones guardadas (mock) en `utils/addresses.ts`, semilladas en `addressStore`.
@@ -321,14 +329,14 @@ Aparece al cargar la app si no hay una dirección seleccionada; se reabre desde 
 - **Cancelado**: card con `CircleXmarkFill` `danger` + motivo (`cancelReason`). **Entregado**: card con `CircleCheckFill` `success` + fecha (`deliveredAt`).
 - Items (cantidad × nombre + subtotal) y total con `tabular-nums`. Atribución de mapa: "© OpenStreetMap · Geoapify". Mapa = `Image` responsive sobre card `bg.panel` `2xl` `overflow="hidden"`, solo en activos.
 
-### 7.8 Autenticación (`AuthLayout` + páginas de auth)
+### 7.8 Autenticación (`apps/auth`)
 
 - **Desktop**: fondo `bg.muted`, card centrada `bg.panel` con `border.subtle` y `3xl` + `md` shadow, `maxW="sm"`, logo `48px` arriba.
 - **Mobile**: full-screen (sin card ni borde) sobre `bg`, logo arriba, campos `size="lg"` full-width y `paddingBottom` con `safe-area-inset-bottom` (look de app nativa).
 - Formularios: `TextField` / `PasswordField` / `TextAreaField` (`size="lg"`, `borderRadius="xl"`, `bg="bg.panel"`, validación con `required` + `invalid` + `errorText`). Contraseñas con `PasswordField` (`PasswordInput` + toggle `Eye`/`EyeClosed`).
-- Éxito de recuperar/restablecer: `AuthSuccess` (ícono `CircleCheckFill` `success` + título + descripción + CTA full-width).
+- Éxito de recuperar/restablecer: `AuthSuccess` (ícono `CircleCheckFill` `success` + título + descripción + CTA full-width), en `apps/auth/src/components/`.
 - CTA primario: `PrimaryButton` con `loading`/`disabled` mientras envía. Links de auth: `TextLink` (`brand.600` `semibold`).
-- `RequireAuth` protege las rutas de tienda; redirige a `/login` con `state.from` para volver al destino tras loguearse. Cierre de sesión en `ProfilePage` ("Cerrar sesión", outline `danger`).
+- Tras `login`/`register` redirige por `role` (`redirectByRole` en `apps/auth/src/config.ts`): `admin` → admin, `client` → store.
 
 ---
 
@@ -395,7 +403,7 @@ Aparece al cargar la app si no hay una dirección seleccionada; se reabre desde 
 2. Botones: usar `PrimaryButton` / `SecondaryButton` / `InverseButton` / `GhostButton` / `OutlineButton` (nunca `Button` con colores a mano).
 3. Textos: usar los tokens de tipografía (`Strong`, `Muted`, `Subtle`, `Price`, `Eyebrow`, `PageTitle`, `SectionTitle`, …), no `Text`/`Heading` con props de estilo repetidas.
 4. Formularios: usar `TextField` / `PasswordField` / `TextAreaField` (nunca `Field.Root` + `Input` a mano).
-5. Layout: toda página usa `PageContainer` o `WidePageContainer` (o `AuthLayout` si es auth).
+5. Layout: toda página usa `PageContainer` o `WidePageContainer` (las páginas de auth están en la app `apps/auth`).
 6. Nav activo: píldora `brand.500` / texto blanco.
 7. Cards: `bg="bg.panel"` + `borderRadius="2xl"` + borde `border.subtle` (solo cuando la entidad lo justifique).
 8. Nuevas pantallas: definir el **protagonista** primero, luego jerarquía primario→secundario, luego identidad.

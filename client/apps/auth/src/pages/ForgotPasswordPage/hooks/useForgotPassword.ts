@@ -1,8 +1,8 @@
-import { useForm } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
-import { useState } from 'react'
-import type { z } from 'zod'
-import { forgotPasswordSchema } from '@repo/domain'
+import { useForm } from "react-hook-form"
+import { zodResolver } from "@hookform/resolvers/zod"
+import { useState } from "react"
+import type { z } from "zod"
+import { forgotPasswordSchema } from "@repo/domain"
 
 type ForgotPasswordValues = z.infer<typeof forgotPasswordSchema>
 
@@ -12,9 +12,9 @@ export const useForgotPassword = () => {
 
   const form = useForm<ForgotPasswordValues>({
     resolver: zodResolver(forgotPasswordSchema),
-    defaultValues: { email: '' },
-    mode: 'onTouched',
-    reValidateMode: 'onChange',
+    defaultValues: { email: "" },
+    mode: "onTouched",
+    reValidateMode: "onChange",
   })
 
   const onSubmit = form.handleSubmit(async () => {

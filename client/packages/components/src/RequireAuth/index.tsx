@@ -3,6 +3,8 @@ import { Navigate, Outlet, useLocation } from "react-router-dom"
 import { useAuthStore } from "@repo/api"
 import type { RequireAuthProps } from "./types"
 
+const isAbsoluteUrl = (url: string) => /^https?:\/\//.test(url)
+
 export const RequireAuth = ({ loginPath, roles }: RequireAuthProps) => {
   const user = useAuthStore((state) => state.user)
   const bypassAuth = useAuthStore((state) => state.bypassAuth)
@@ -19,10 +21,18 @@ export const RequireAuth = ({ loginPath, roles }: RequireAuthProps) => {
   const effectiveBypass = param === "false" ? false : param === "true" ? true : bypassAuth
 
   if (!user && !effectiveBypass) {
+    if (isAbsoluteUrl(loginPath)) {
+      window.location.assign(loginPath)
+      return null
+    }
     return <Navigate to={loginPath} replace state={{ from: location }} />
   }
 
   if (roles && user && !roles.includes(user.role)) {
+    if (isAbsoluteUrl(loginPath)) {
+      window.location.assign(loginPath)
+      return null
+    }
     return <Navigate to={loginPath} replace />
   }
 

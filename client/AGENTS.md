@@ -21,6 +21,7 @@ Esta carpeta (`client/`) contiene únicamente las aplicaciones de frontend (mono
 
 - `apps/store` — Aplicación cliente (Vite + React + Chakra UI) — puerto 5173.
 - `apps/admin` — Aplicación administrativa (Vite + React + Chakra UI) — puerto 5174.
+- `apps/auth` — Aplicación de autenticación (login/registro/recuperar contraseña) — puerto 5175. Tras loguearse redirige a store o admin según el `role` que devuelve el auth API (`src/config.ts`: `VITE_STORE_URL` / `VITE_ADMIN_URL`).
 
 ## Estructura de cada app
 
