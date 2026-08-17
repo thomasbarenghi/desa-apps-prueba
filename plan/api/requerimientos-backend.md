@@ -6,7 +6,7 @@
 **Fuente de verdad funcional:** `client/docs/requerimientos-funcionales.md`
 **Versión:** 1.0
 
-> Este documento define el alcance del **backend** como un conjunto de microservicios que exponen un único endpoint GraphQL mediante un **API Gateway (Apollo Federation)**. Cada servicio es dueño de su dominio y de su propia base **MongoDB**. La propuesta de arquitectura previa está en `plan/backend-microservicios-propuesta.md`.
+> Este documento define el alcance del **backend** como un conjunto de microservicios detrás de un **API Gateway (Apollo Federation)**, expuesto a los frontends a través de **BFF** (Backend for Frontend). Cada servicio es dueño de su dominio y de su propia base **MongoDB**. La propuesta de arquitectura está en `plan/backend-microservicios-propuesta.md`.
 
 ---
 
@@ -15,7 +15,7 @@
 1. [Objetivo y alcance](#1-objetivo-y-alcance)
 2. [Arquitectura general](#2-arquitectura-general)
 3. [Servicios y responsabilidades](#3-servicios-y-responsabilidades)
-4. [API Gateway (GraphQL)](#4-api-gateway-graphql)
+4. [Capa de entrada: BFF y API Gateway](#4-capa-de-entrada-bff-y-api-gateway)
 5. [Auth API](#5-auth-api)
 6. [Catalog API](#6-catalog-api)
 7. [Branch API](#7-branch-api)
@@ -34,21 +34,22 @@
 
 # 1. Objetivo y alcance
 
-El backend da soporte a los cinco frontends (`apps/auth`, `apps/store`, `apps/admin`, `apps/admin-global`, `apps/rider`) mediante un **único endpoint GraphQL**.
+El backend da soporte a los cinco frontends (`apps/auth`, `apps/store`, `apps/admin`, `apps/admin-global`, `apps/rider`). Cada frontend consume su **BFF**, que a su vez habla con un **API Gateway** (GraphQL).
 
-Se implementa como un conjunto de **microservicios**:
+Se implementa como un conjunto de **microservicios** más una capa de entrada:
 
-1. **API Gateway (GraphQL / Apollo Federation)** — punto único de entrada.
-2. **Auth API** — identidad, sesión, JWT, recuperación de contraseña y personal.
-3. **Catalog API** — categorías, productos, configuraciones, ingredientes/recetas y promociones.
-4. **Branch API** — sucursales, horarios y geolocalización.
-5. **Cart API** — carrito, ítems y total.
-6. **Order API** — pedidos, estados, asignación de sucursal y ETA.
-7. **Stock API** — inventario de ingredientes por sucursal.
-8. **Delivery API** — repartidores, viajes y ofertas.
-9. **Reporting API** — reportes de productos.
+1. **BFF (Backend for Frontend)** — `Auth BFF`, `Store BFF`, `Admin BFF`, `AdminGlobal BFF`, `Rider BFF`: punto de entrada por frontend y dueños de la orquestación de casos de uso.
+2. **API Gateway (GraphQL / Apollo Federation)** — router de federación delgado.
+3. **Auth API** — identidad, sesión, JWT, recuperación de contraseña y personal.
+4. **Catalog API** — categorías, productos, configuraciones, ingredientes/recetas y promociones.
+5. **Branch API** — sucursales, horarios y geolocalización.
+6. **Cart API** — carrito, ítems y total.
+7. **Order API** — pedidos, estados, asignación de sucursal y ETA.
+8. **Stock API** — inventario de ingredientes por sucursal.
+9. **Delivery API** — repartidores, viajes y ofertas.
+10. **Reporting API** — reportes de productos.
 
-Cada servicio posee su propia base **MongoDB**. Los servicios se comunican de forma **síncrona** (a través del gateway mediante GraphQL Federation) y **asíncrona** (mediante eventos en un broker).
+Cada servicio posee su propia base **MongoDB**. Los BFF son stateless (sin base propia). La comunicación es **síncrona** (BFF → gateway → subgraphs, mediante GraphQL Federation) y **asíncrona** (mediante eventos en un broker).
 
 ---
 
@@ -64,15 +65,29 @@ flowchart TB
         RIDER["apps/rider"]
     end
 
-    subgraph EDGE["Capa de entrada"]
-        GW["API Gateway (GraphQL · Apollo Federation)\n· único endpoint /graphql · valida JWT · compone supergraph"]
+    subgraph BFFS["BFF (por frontend)"]
+        AUTH_BFF["Auth BFF"]
+        STORE_BFF["Store BFF"]
+        ADMIN_BFF["Admin BFF"]
+        ADMIN_GLOBAL_BFF["AdminGlobal BFF"]
+        RIDER_BFF["Rider BFF"]
     end
 
-    AUTH_APP --> GW
-    STORE --> GW
-    ADMIN --> GW
-    ADMIN_GLOBAL --> GW
-    RIDER --> GW
+    subgraph EDGE["Capa de entrada"]
+        GW["API Gateway (GraphQL · Apollo Federation)\n· único endpoint · valida JWT · compone supergraph"]
+    end
+
+    AUTH_APP --> AUTH_BFF
+    STORE --> STORE_BFF
+    ADMIN --> ADMIN_BFF
+    ADMIN_GLOBAL --> ADMIN_GLOBAL_BFF
+    RIDER --> RIDER_BFF
+
+    AUTH_BFF --> GW
+    STORE_BFF --> GW
+    ADMIN_BFF --> GW
+    ADMIN_GLOBAL_BFF --> GW
+    RIDER_BFF --> GW
 
     subgraph SERVICES["Microservicios (subgraphs)"]
         AUTH["Auth API"]
@@ -132,7 +147,12 @@ flowchart TB
 
 | Servicio | Responsabilidad | Colecciones propias (MongoDB) |
 |---|---|---|
-| **API Gateway** | Endpoint único, valida JWT, compone el supergraph, rate limiting, logs de entrada. | Ninguna. |
+| **Auth BFF** | Contrato fijo con `apps/auth`: login, registro, recuperación, refresh, logout, `me`. | Ninguna (stateless). |
+| **Store BFF** | Orquestación de la Tienda: `home`, detalle de producto, carrito, `checkout`, seguimiento, repetir pedido. | Ninguna (stateless). |
+| **Admin BFF** (sucursal) | Orquestación del admin de sucursal: pausar/reactivar productos, stock de su almacén, pedidos y reportes de su sucursal. | Ninguna (stateless). |
+| **AdminGlobal BFF** | Orquestación del admin global: productos/recetas, catálogo de ingredientes, categorías, sucursales, promociones, personal, vista global de pedidos/stock/reportes. | Ninguna (stateless). |
+| **Rider BFF** | Orquestación del Repartidor: ofertas de viaje, aceptar/rechazar, retiros/entregas, historial. | Ninguna (stateless). |
+| **API Gateway** | Router de federación detrás de los BFF; valida JWT, compone el supergraph, rate limiting, logs. | Ninguna. |
 | **Auth API** | Registro, login, refresh, recuperación de contraseña, perfiles, personal, roles. Emite/valida JWT. | `users`, `passwordRecovery`, `refreshTokens` |
 | **Catalog API** | Categorías, productos, configuraciones, ingredientes/recetas, promociones. | `categories`, `products`, `ingredients`, `promotions` |
 | **Branch API** | Sucursales, horarios, cálculo de distancia y disponibilidad. | `branches` |
@@ -144,9 +164,33 @@ flowchart TB
 
 ---
 
-# 4. API Gateway (GraphQL)
+# 4. Capa de entrada: BFF y API Gateway
 
-El gateway es el **único punto de contacto** entre los frontends y los servicios. Expone un solo endpoint `POST /graphql`.
+## 4.1 BFF (Backend for Frontend)
+
+Cada frontend tiene su propio **BFF**: un servidor GraphQL que expone el esquema específico de ese cliente y es dueño de la **orquestación** de los casos de uso cross (orden, reglas, fallbacks). El BFF no tiene base de datos propia y consume el API Gateway para resolver datos de dominio.
+
+| BFF | Casos de uso cross |
+|---|---|
+| **Auth BFF** | `login`, `register`, `requestPasswordRecovery`, `resetPassword`, `refreshToken`, `logout`, `me`. |
+| **Store BFF** | `home(lat,lng)` (sucursales + catálogo + stock), `getProductDetail`, `addToCart`, `checkout`, `trackOrder`, `repeatOrder`. |
+| **Admin BFF** (sucursal) | pausar/reactivar productos de su sucursal, stock de su almacén, pedidos y reportes de su sucursal. |
+| **AdminGlobal BFF** | productos con receta/ingredientes, catálogo de ingredientes, categorías, sucursales, promociones, personal vinculado a sucursal, vista global de pedidos/stock/reportes. |
+| **Rider BFF** | `offerTrip`, aceptar/rechazar viaje, marcar retiro/entrega, historial de viajes. |
+
+| ID | Requerimiento |
+|---|---|
+| RQ-BFF-01 | Deberá existir un BFF por frontend: `Auth BFF`, `Store BFF`, `Admin BFF`, `AdminGlobal BFF` y `Rider BFF`. |
+| RQ-BFF-02 | Cada BFF deberá exponer un esquema GraphQL propio y acotado a las necesidades de su frontend. |
+| RQ-BFF-03 | El BFF deberá ser el único dueño de la orquestación de casos de uso cross (orden, reglas y fallbacks). |
+| RQ-BFF-04 | El BFF deberá consumir el API Gateway para resolver datos de dominio, reenviando el token del usuario (no accede a servicios ni bases directamente). |
+| RQ-BFF-05 | El BFF deberá ser stateless: sin base de datos ni estado de negocio propio. |
+| RQ-BFF-06 | El `Auth BFF` deberá ser el contrato fijo del frontend de auth y el lugar para lógica adicional (rotación de tokens, reglas post-login). |
+| RQ-BFF-07 | El cliente no deberá orquestar reglas de negocio: solo consume su BFF. |
+
+## 4.2 API Gateway (GraphQL)
+
+El gateway es el **router de federación** que queda detrás de los BFF. Expone un solo endpoint `POST /graphql` (usado por los BFF).
 
 | ID | Requerimiento |
 |---|---|
@@ -388,7 +432,8 @@ Servicio de solo lectura para los reportes de productos.
 ```mermaid
 flowchart LR
     subgraph SYNC["Síncrono — GraphQL Federation"]
-        GW["API Gateway"] --> AUTH["Auth API"]
+        BFF["BFF"] --> GW["API Gateway"]
+        GW --> AUTH["Auth API"]
         GW --> CATALOG["Catalog API"]
         GW --> CART["Cart API"]
         GW --> ORDER["Order API"]
@@ -409,7 +454,7 @@ flowchart LR
 
 | ID | Requerimiento |
 |---|---|
-| RQ-COM-01 | La comunicación síncrona entre dominios deberá resolverse a través del gateway (federación de entidades `@key`). |
+| RQ-COM-01 | La comunicación síncrona deberá fluir así: **BFF → gateway → subgraphs** (federación de entidades `@key`). |
 | RQ-COM-02 | Los efectos colaterales (descuento de stock, actualización de reportes, cambios de viaje) deberán comunicarse por eventos asíncronos. |
 | RQ-COM-03 | Los eventos deberán tener un esquema versionado y un identificador de correlación (`orderId`, `tripId`). |
 | RQ-COM-04 | El consumo de eventos deberá ser idempotente (reprocesar un evento no deberá duplicar efectos). |
@@ -422,18 +467,23 @@ flowchart LR
 ```mermaid
 sequenceDiagram
     participant F as Frontend
+    participant BFF as BFF (Auth/Store)
     participant GW as API Gateway
     participant A as Auth API
     participant O as Order API
 
-    F->>A: login(email, password)
-    A-->>F: accessToken (JWT) + refreshToken
+    F->>BFF: login(email, password)
+    BFF->>A: login(email, password)
+    A-->>BFF: accessToken (JWT) + refreshToken
+    BFF-->>F: accessToken + refreshToken
 
-    F->>GW: query(order) · Authorization: Bearer accessToken
+    F->>BFF: query(order) · Authorization: Bearer accessToken
+    BFF->>GW: query federada · Bearer accessToken
     GW->>GW: valida firma, expiración y roles del JWT
     GW->>O: resolver con contexto {userId, roles, branchId}
     O-->>GW: datos del pedido
-    GW-->>F: respuesta compuesta
+    GW-->>BFF: respuesta compuesta
+    BFF-->>F: respuesta armada
 ```
 
 | ID | Requerimiento |

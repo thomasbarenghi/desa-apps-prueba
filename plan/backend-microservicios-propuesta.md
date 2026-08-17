@@ -1,16 +1,16 @@
 # Propuesta de arquitectura — Backend con microservicios
 
 **Proyecto:** Plataforma de pedidos para una cadena de comidas rápidas
-**Documento:** propuesta de arquitectura del backend (borrador para validación)
-**Estado:** pendiente de confirmación
+**Documento:** propuesta de arquitectura del backend
+**Estado:** confirmado
 
-> Este documento propone una **arquitectura de microservicios** para el backend, distinta del monolito modular actual. Antes de redactar el documento de requerimientos, se valida esta estructura.
+> Este documento define la **arquitectura de microservicios** del backend. Los requerimientos correspondientes viven en `plan/api/requerimientos-backend.md`.
 
 ---
 
 ## 1. Visión general
 
-Los cinco frontends (auth, tienda, admin de sucursal, admin global y repartidor) consumen un **único endpoint GraphQL** expuesto por un **API Gateway**. Detrás del gateway, cada dominio vive en un microservicio independiente que expone su propio *subgraph*.
+Los cinco frontends (auth, tienda, admin de sucursal, admin global y repartidor) consumen su **BFF** (Backend for Frontend), que a su vez habla con un **API Gateway** (GraphQL). Detrás del gateway, cada dominio vive en un microservicio independiente que expone su propio *subgraph*. El detalle de la capa BFF está en §5.
 
 ```mermaid
 flowchart TB
@@ -22,15 +22,29 @@ flowchart TB
         RIDER["apps/rider"]
     end
 
-    subgraph EDGE["Capa de entrada"]
-        GW["API Gateway (GraphQL · Apollo Federation)\n· único endpoint /graphql · valida JWT · compone supergraph"]
+    subgraph BFFS["BFF (Backend for Frontend)"]
+        AUTH_BFF["Auth BFF"]
+        STORE_BFF["Store BFF"]
+        ADMIN_BFF["Admin BFF (sucursal)"]
+        ADMIN_GLOBAL_BFF["AdminGlobal BFF"]
+        RIDER_BFF["Rider BFF"]
     end
 
-    AUTH_APP --> GW
-    STORE --> GW
-    ADMIN --> GW
-    ADMIN_GLOBAL --> GW
-    RIDER --> GW
+    subgraph EDGE["Capa de entrada"]
+        GW["API Gateway (GraphQL · Apollo Federation)\n· único endpoint · valida JWT · compone supergraph"]
+    end
+
+    AUTH_APP --> AUTH_BFF
+    STORE --> STORE_BFF
+    ADMIN --> ADMIN_BFF
+    ADMIN_GLOBAL --> ADMIN_GLOBAL_BFF
+    RIDER --> RIDER_BFF
+
+    AUTH_BFF --> GW
+    STORE_BFF --> GW
+    ADMIN_BFF --> GW
+    ADMIN_GLOBAL_BFF --> GW
+    RIDER_BFF --> GW
 
     subgraph SERVICES["Microservicios (subgraphs GraphQL)"]
         AUTH["Auth API\nidentidad, sesión, JWT, recuperación, personal"]
@@ -142,17 +156,21 @@ flowchart TB
 ```mermaid
 sequenceDiagram
     participant F as Frontend
+    participant BFF as BFF
     participant GW as API Gateway
     participant A as Auth API
 
-    F->>A: login(email, password)
-    A-->>F: accessToken (JWT) + refreshToken
+    F->>BFF: login(email, password)
+    BFF->>A: login(email, password)
+    A-->>BFF: accessToken (JWT) + refreshToken
+    BFF-->>F: accessToken + refreshToken
 
-    F->>GW: query GraphQL (Authorization: Bearer accessToken)
-    GW->>GW: valida firma y expiración del JWT
+    F->>BFF: query GraphQL (Authorization: Bearer accessToken)
+    BFF->>GW: query federada (Bearer accessToken)
+    GW->>GW: valida firma, expiración y roles del JWT
     GW->>GW: inyecta roles en el contexto GraphQL
-    GW->>A: introspect/subgraph currentUser (si la query lo pide)
-    GW-->>F: resultado compuesto del supergraph
+    GW-->>BFF: resultado compuesto del supergraph
+    BFF-->>F: respuesta armada
 ```
 
 - El **Auth API** es el único que emite y conoce los JWT.
@@ -161,7 +179,105 @@ sequenceDiagram
 
 ---
 
-## 5. Decisiones de diseño (resumen)
+## 5. BFF (Backend for Frontend) — orquestación cross
+
+Orden correcto: **cliente → BFF (GraphQL) → API Gateway (GraphQL) → microservicios**.
+
+- El **BFF** es el punto de entrada de cada frontend: expone el esquema específico de ese cliente y es dueño de la **orquestación** de los casos de uso (orden, reglas, fallbacks).
+- El **API Gateway** queda **detrás** del BFF: router de federación delgado (auth + composición de subgraphs), sin reglas de negocio.
+- El **Auth BFF** existe por el mismo motivo que los demás: contrato fijo con `apps/auth` y lugar para lógica adicional (rotación de tokens, reglas post-login), sin ensuciar el dominio de la Auth API.
+
+```mermaid
+flowchart LR
+    subgraph CLIENTS["Frontends"]
+        AUTH_APP["apps/auth"]
+        STORE["apps/store"]
+        ADMIN["apps/admin"]
+        ADMIN_GLOBAL["apps/admin-global"]
+        RIDER["apps/rider"]
+    end
+
+    subgraph BFFS["BFF (por frontend)"]
+        AUTH_BFF["Auth BFF\n(GraphQL)"]
+        STORE_BFF["Store BFF\n(GraphQL)"]
+        ADMIN_BFF["Admin BFF\n(sucursal · GraphQL)"]
+        ADMIN_GLOBAL_BFF["AdminGlobal BFF\n(GraphQL)"]
+        RIDER_BFF["Rider BFF\n(GraphQL)"]
+    end
+
+    GW["API Gateway\n(GraphQL · delgado)\nauth + federación"]
+
+    subgraph SERVICES["Servicios de dominio (subgraphs)"]
+        AUTH["Auth API"]
+        BRANCH["Branch API"]
+        CATALOG["Catalog API"]
+        STOCK["Stock API"]
+        CART["Cart API"]
+        ORDER["Order API"]
+        DELIVERY["Delivery API"]
+        REPORT["Reporting API"]
+    end
+
+    AUTH_APP --> AUTH_BFF
+    STORE --> STORE_BFF
+    ADMIN --> ADMIN_BFF
+    ADMIN_GLOBAL --> ADMIN_GLOBAL_BFF
+    RIDER --> RIDER_BFF
+
+    AUTH_BFF --> GW
+    STORE_BFF --> GW
+    ADMIN_BFF --> GW
+    ADMIN_GLOBAL_BFF --> GW
+    RIDER_BFF --> GW
+
+    GW --> AUTH
+    GW --> BRANCH
+    GW --> CATALOG
+    GW --> STOCK
+    GW --> CART
+    GW --> ORDER
+    GW --> DELIVERY
+    GW --> REPORT
+```
+
+### Casos de uso que resuelve cada BFF
+
+| BFF | Casos de uso cross |
+|---|---|
+| **Auth BFF** | `login`, `register`, `requestPasswordRecovery`, `resetPassword`, `refreshToken`, `logout`, `me`. Contrato fijo con el frontend de auth; punto para lógica adicional (rotación de tokens, reglas post-login). |
+| **Store BFF** | `home(lat,lng)` (sucursales + catálogo + stock), `getProductDetail`, `addToCart` (validando producto + configs), `checkout` (dirección → sucursal → stock → total → confirmar), `trackOrder` (pedido + sucursal + historial), `repeatOrder`. |
+| **Admin BFF** (sucursal) | pausar/reactivar productos de su sucursal, stock de su almacén, pedidos y reportes de su sucursal. |
+| **AdminGlobal BFF** | productos con receta/ingredientes, catálogo de ingredientes, categorías, sucursales, promociones, personal vinculado a sucursal, vista global de pedidos/stock/reportes. |
+| **Rider BFF** | `offerTrip` (ubicación → oferta de viaje), aceptar/rechazar viaje, marcar retiro/entrega, historial de viajes. |
+
+### Ejemplo: obtener el catálogo (regla "stock → preparable")
+
+```mermaid
+sequenceDiagram
+    participant C as Cliente (store)
+    participant BFF as Store BFF (GraphQL)
+    participant AG as API Gateway (GraphQL)
+
+    C->>BFF: query { home(lat, lng) { ... } }
+    BFF->>AG: sucursales abiertas cercanas (Branch)
+    AG-->>BFF: sucursales
+    BFF->>AG: categorías + productos activos (Catalog)
+    AG-->>BFF: catálogo
+    BFF->>AG: stock por sucursal (Stock)
+    AG-->>BFF: stock
+    BFF->>BFF: regla "preparable" + armado de respuesta
+    BFF-->>C: home armado
+```
+
+### Regla
+
+- **Cliente:** una query GraphQL contra **su BFF**; no conoce el gateway ni orquesta reglas.
+- **BFF:** dueño de los casos de uso cross; llama al API Gateway y arma la respuesta.
+- **API Gateway:** delgado (auth + federación); nunca reglas de negocio.
+
+---
+
+## 6. Decisiones de diseño (resumen)
 
 | Decisión | Justificación |
 |---|---|
@@ -170,12 +286,76 @@ sequenceDiagram
 | **Síncrono vía gateway / asíncrono vía eventos** | Separa operaciones transaccionales de efectos colaterales. |
 | **Base de datos por servicio** | Cada servicio dueño de sus tablas; `Reporting` lee réplicas/eventos. |
 | **Catálogo vs Stock separados** | Lo global (productos/recetas) no se acopla a lo operativo por sucursal. |
+| **BFF para orquestación cross** | El gateway solo une datos; las reglas entre servicios (sucursal + stock + catálogo) viven en un BFF por frontend. |
 | **Pedidos vs Carrito separados** | Ciclos de vida distintos; el pedido es inmutable tras confirmarse, el carrito es mutable. |
 
 ---
 
-## 6. Decisiones confirmadas
+## 7. Decisiones confirmadas
 
 - **Base de datos:** MongoDB, una base por servicio (documentos embebidos; sin joins).
 - **Broker:** por definir (RabbitMQ o Kafka) — no bloquea el documento de requerimientos.
 - **Desglose:** confirmado tal cual (8 servicios + gateway).
+- **BFF:** confirmado (Auth/Store/Admin/AdminGlobal/Rider BFF) — ver §5.
+- **Repositorios:** `backend/` (turborepo de servicios), `bff/` (turborepo de BFFs) y `gateway/` (standalone) — ver §8.
+
+---
+
+## 8. Organización de repositorios (Turborepo)
+
+Se proponen **tres repos backend** + el `client/` existente:
+
+```text
+desa-apps-prueba/
+├── client/        # turborepo (existente) — frontends
+│   ├── apps/      # auth, store, admin, admin-global, rider
+│   └── packages/  # components, domain, api, theme, ...
+│
+├── backend/       # turborepo — microservicios de dominio
+│   ├── apps/
+│   │   ├── auth-api
+│   │   ├── catalog-api
+│   │   ├── branch-api
+│   │   ├── cart-api
+│   │   ├── order-api
+│   │   ├── stock-api
+│   │   ├── delivery-api
+│   │   └── reporting-api
+│   └── packages/
+│       ├── config/        # tsconfig, eslint, prettier
+│       ├── mongo/         # conexión y helpers de MongoDB
+│       ├── events/        # esquemas de eventos del broker
+│       ├── graphql/       # boilerplate de subgraph (federación, @key)
+│       └── errors/        # formato de error compartido
+│
+├── bff/           # turborepo — BFFs
+│   ├── apps/
+│   │   ├── auth-bff
+│   │   ├── store-bff
+│   │   ├── admin-bff
+│   │   ├── admin-global-bff
+│   │   └── rider-bff
+│   └── packages/
+│       ├── config/
+│       ├── gateway-client/  # cliente del API Gateway (federación)
+│       └── auth/            # reenvío de JWT / contexto
+│
+└── gateway/       # repo standalone — Apollo Router
+    ├── router.yaml         # config del router
+    └── supergraph/         # URLs de los subgraphs
+```
+
+### Por qué así
+
+| Repo | Qué agrupa | Razón |
+|---|---|---|
+| `backend/` | 8 servicios de dominio | Comparten stack (NestJS + Mongo), paquetes de subgraph, eventos y errores. `turbo dev` levanta todo en local. |
+| `bff/` | 5 BFF | Comparten el cliente del gateway y el reenvío de auth; son la capa de orquestación por frontend. |
+| `gateway/` | Apollo Router | Lifecycle distinto (única entrada, deployment en el edge, es casi todo configuración). |
+| `client/` | 5 frontends | Ya existente. |
+
+### Notas
+
+- Aunque compartan repo, **cada servicio/BFF se despliega y versiona por separado** (Turborepo lo soporta con `turbo build --filter=...` y pipelines por app).
+- El gateway podría vivir dentro de `backend/`, pero se mantiene standalone para aislar la entrada de la plataforma (cambios y releases independientes).
+- El `api/` actual (monolito NestJS) se **refactoriza/splitea** hacia `backend/` (servicios), `bff/` (orquestación) y `gateway/` (router).

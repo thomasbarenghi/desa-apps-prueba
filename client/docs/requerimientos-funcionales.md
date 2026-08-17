@@ -49,14 +49,22 @@ La solución tendrá cinco aplicaciones web:
 4. **Frontend Admin global** (`apps/admin-global`), utilizado por la administración central.
 5. **Frontend Repartidor** (`apps/rider`), utilizado por repartidores.
 
-Todas las aplicaciones consumirán el **mismo endpoint GraphQL**, expuesto por un **API Gateway** que enruta hacia los microservicios del backend. La lógica de negocio permanece en el servidor; los frontends se ocupan de presentar información, capturar datos, ejecutar acciones y mostrar los resultados devueltos por la API.
+Todas las aplicaciones consumen su **BFF** (Backend for Frontend), que a su vez habla con un **API Gateway** (GraphQL) que enruta hacia los microservicios del backend. La lógica de negocio permanece en el servidor; los frontends se ocupan de presentar información, capturar datos, ejecutar acciones y mostrar los resultados devueltos por la API.
 
 ```mermaid
 flowchart LR
-    STORE[Frontend Tienda] --> GW[API Gateway GraphQL]
-    ADMIN[Admin de sucursal] --> GW
-    GLOBAL[Admin global] --> GW
-    RIDER[Frontend Repartidor] --> GW
+    AUTH[Frontend Auth] --> ABFF[Auth BFF]
+    STORE[Frontend Tienda] --> SBFF[Store BFF]
+    ADMIN[Admin de sucursal] --> ABF[Admin BFF]
+    GLOBAL[Admin global] --> GABF[AdminGlobal BFF]
+    RIDER[Frontend Repartidor] --> RBFF[Rider BFF]
+
+    ABFF --> GW[API Gateway GraphQL]
+    SBFF --> GW
+    ABF --> GW
+    GABF --> GW
+    RBFF --> GW
+
     GW --> SVC[Microservicios backend]
     SVC --> DB[(MongoDB por servicio)]
 ```
@@ -2668,12 +2676,14 @@ Usar confirmación para:
 
 ## 13.1 Principio general
 
-Cada pantalla ejecuta una query o mutation GraphQL contra el **API Gateway** y presenta la respuesta. La UI no debe conocer los microservicios internos ni su base de datos; solo conoce el endpoint `/graphql` y el esquema.
+Cada pantalla ejecuta una query o mutation GraphQL contra el **BFF** de su aplicación y presenta la respuesta. La UI no debe conocer los microservicios internos ni su base de datos; solo conoce el endpoint de su BFF y su esquema.
 
 ```text
 Página / componente
         ↓
-Cliente GraphQL (Apollo Client / fetch a /graphql)
+Cliente GraphQL (Apollo Client / fetch al BFF)
+        ↓
+BFF (orquesta los casos de uso cross)
         ↓
 API Gateway (valida JWT y compone el supergraph)
         ↓
@@ -2686,7 +2696,7 @@ Respuesta GraphQL
 
 ```text
 shared/api/
-├── client.ts        # Apollo Client apuntando a /graphql (token en headers)
+├── client.ts        # Apollo Client apuntando al BFF de la app (token en headers)
 └── graphql/
     ├── auth/        # queries/mutations de sesión, perfil y recuperación
     ├── catalog/     # categorías, productos, configuraciones, ingredientes
@@ -2697,6 +2707,8 @@ shared/api/
     ├── delivery/    # viajes y ofertas del repartidor
     └── reports/     # reportes de productos
 ```
+
+`apps/auth` apunta al Auth BFF, `apps/store` al Store BFF, `apps/admin` al Admin BFF, `apps/admin-global` al AdminGlobal BFF y `apps/rider` al Rider BFF.
 
 ## 13.3 Contratos de UI
 
