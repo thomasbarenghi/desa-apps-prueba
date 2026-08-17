@@ -2,7 +2,8 @@ import { Routes, Route } from "react-router-dom"
 import { StoreLayout } from "./layouts/StoreLayout"
 import { RequireAuth } from "@repo/components"
 import { routes } from "./routes"
-import { AUTH_URL } from "./config"
+import { AUTH_URL, MOCK_AUTH } from "./config"
+import { useNativeSystemBars } from "./hooks/useNativeSystemBars"
 import { HomePage } from "./pages/HomePage"
 import { CatalogPage } from "./pages/CatalogPage"
 import { ProductDetailPage } from "./pages/ProductDetailPage"
@@ -16,9 +17,11 @@ import { EditProfilePage } from "./pages/EditProfilePage"
 import { AddressesPage } from "./pages/AddressesPage"
 
 export const App = () => {
+  useNativeSystemBars()
+
   return (
     <Routes>
-      <Route element={<RequireAuth loginPath={`${AUTH_URL}/login`} />}>
+      <Route element={<RequireAuth loginPath={`${AUTH_URL}/login`} mockAuth={MOCK_AUTH} />}>
         <Route element={<StoreLayout />}>
           <Route index element={<HomePage />} />
           <Route path={routes.catalog} element={<CatalogPage />} />

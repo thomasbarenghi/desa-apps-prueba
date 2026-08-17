@@ -8,9 +8,11 @@
     "build": "tsc -b && vite build",
     "preview": "vite preview",
     "lint": "eslint . --max-warnings 0",
-    "check-types": "tsc -b"
+    "check-types": "tsc -b",
+    "android": "vite build --mode native && cap sync android && cap open android"
   },
   "dependencies": {
+    "@capacitor/core": "^8.5.0",
     "@chakra-ui/react": "^3.36.1",
     "@emotion/react": "^11.14.0",
     "@gravity-ui/icons": "^2.21.0",
@@ -29,6 +31,8 @@
     "zustand": "^5.0.14"
   },
   "devDependencies": {
+    "@capacitor/android": "^8.5.0",
+    "@capacitor/cli": "^8.5.0",
     "@repo/eslint-config": "*",
     "@repo/typescript-config": "*",
     "@types/node": "^22.15.3",

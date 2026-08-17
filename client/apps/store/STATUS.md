@@ -45,7 +45,15 @@ npm run dev           # vite --port 5173
 npm run build         # tsc -b && vite build
 npm run lint          # eslint . --max-warnings 0
 npm run check-types   # tsc -b
+npm run android       # vite build --mode native && cap sync android && cap open android
 ```
+
+### Android (Capacitor)
+
+- El store puede empaquetarse como app Android con **Capacitor 8** (`capacitor.config.ts` + `android/`).
+- El build nativo usa `.env.native` → `VITE_MOCK_AUTH=true` (auth mockeado en la app; el webview remoto con auth real es un pendiente futuro).
+- **Requisitos:** JDK 17 o 21 (vía SDKMAN: `sdk env` con el `.sdkmanrc` del repo, `java=21.0.8-ms`) + Android SDK (`ANDROID_HOME`). Java 25 rompe Gradle 8.14.3.
+- `npm run android` builda con mock auth, sincroniza y abre Android Studio.
 
 Estructura:
 

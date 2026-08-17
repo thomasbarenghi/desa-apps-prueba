@@ -5,7 +5,7 @@ import type { RequireAuthProps } from "./types"
 
 const isAbsoluteUrl = (url: string) => /^https?:\/\//.test(url)
 
-export const RequireAuth = ({ loginPath, roles }: RequireAuthProps) => {
+export const RequireAuth = ({ loginPath, roles, mockAuth }: RequireAuthProps) => {
   const user = useAuthStore((state) => state.user)
   const bypassAuth = useAuthStore((state) => state.bypassAuth)
   const setBypassAuth = useAuthStore((state) => state.setBypassAuth)
@@ -18,7 +18,13 @@ export const RequireAuth = ({ loginPath, roles }: RequireAuthProps) => {
     if (param === "false") setBypassAuth(false)
   }, [param, setBypassAuth])
 
-  const effectiveBypass = param === "false" ? false : param === "true" ? true : bypassAuth
+  const effectiveBypass = mockAuth
+    ? true
+    : param === "false"
+      ? false
+      : param === "true"
+        ? true
+        : bypassAuth
 
   if (!user && !effectiveBypass) {
     if (isAbsoluteUrl(loginPath)) {
@@ -28,7 +34,7 @@ export const RequireAuth = ({ loginPath, roles }: RequireAuthProps) => {
     return <Navigate to={loginPath} replace state={{ from: location }} />
   }
 
-  if (roles && user && !roles.includes(user.role)) {
+  if (!mockAuth && roles && user && !roles.includes(user.role)) {
     if (isAbsoluteUrl(loginPath)) {
       window.location.assign(loginPath)
       return null
